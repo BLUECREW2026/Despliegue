@@ -1,0 +1,208 @@
+@host = http://localhost:8080
+
+### ==========================================
+### 1. AUTH (Identificación)
+### ==========================================
+
+### 1.1 Iniciar sesión con Pepe
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "pepe@bluecrew.com",
+  "password": "admin"
+}
+
+
+### ==========================================
+### 2. USUARIOS (Flujo del Registro X -> ID 31)
+### ==========================================
+
+### 2.1 Obtener todos los usuarios
+GET {{host}}/api/usuarios
+
+### 2.2 POST: Crear el Usuario X
+POST {{host}}/api/usuarios
+Content-Type: application/json
+
+{
+  "nombre": "Usuario X",
+  "apellido": "De Prueba",
+  "email": "usuario.x@bluecrew.com",
+  "password_hash": "secreta123",
+  "biografia": "Usuario temporal para testing"
+}
+
+### 2.3 PUT: Modificar el Usuario X
+PUT {{host}}/api/usuarios/31
+Content-Type: application/json
+
+{
+  "nombre": "Usuario X (Modificado)",
+  "biografia": "Biografía actualizada durante el test"
+}
+
+### 2.4 DELETE: Borrar el Usuario X
+DELETE {{host}}/api/usuarios/31
+
+
+### ==========================================
+### 3. ORGANIZACIONES (Flujo del Registro X -> ID 31)
+### ==========================================
+
+### 3.1 Obtener todas las organizaciones
+GET {{host}}/api/organizaciones
+
+### 3.2 POST: Crear la Organización X
+POST {{host}}/api/organizaciones
+Content-Type:application/json
+
+{
+  "nombreOrganizacion": "Organización X",
+  "descripcion": "Organización temporal para testing",
+  "sitioWeb": "www.org-x.com",
+  "telefono": "600000000",
+  "email": "contacto@org-x.com",
+  "passwordHash": "hashsecreto",
+  "estadoAprobacion": "PENDIENTE"
+}
+
+### 3.3 PUT: Modificar la Organización X
+PUT {{host}}/api/organizaciones
+Content-Type: application/json
+
+{
+  "idOrganizacion": 31,
+  "nombreOrganizacion": "Organización X (Modificada)",
+  "descripcion": "Descripción actualizada"
+}
+
+### 3.4 DELETE: Borrar la Organización X
+DELETE {{host}}/api/organizaciones/31
+
+
+### ==========================================
+### 4. CATEGORÍAS (Flujo del Registro X -> ID 31)
+### ==========================================
+
+### 4.1 Obtener todas las categorías
+GET {{host}}/api/categorias
+
+### 4.2 POST: Crear la Categoría X
+POST {{host}}/api/categorias
+Content-Type: application/json
+
+{
+  "creador": { "id": 1 },
+  "nombreCategoria": "Categoría X",
+  "descripcion": "Categoría temporal de prueba"
+}
+
+### 4.3 PUT: Modificar la Categoría X
+PUT {{host}}/api/categorias
+Content-Type: application/json
+
+{
+  "idCategoria": 31,
+  "nombreCategoria": "Categoría X (Modificada)",
+  "descripcion": "Nueva descripción para la categoría X"
+}
+
+### 4.4 DELETE: Borrar la Categoría X
+DELETE {{host}}/api/categorias/31
+
+
+### ==========================================
+### 5. EVENTOS (Flujo del Registro X -> ID 31)
+### ==========================================
+
+### 5.1 Obtener todos los eventos
+GET {{host}}/api/eventos
+
+### 5.2 POST: Crear el Evento X
+POST {{host}}/api/eventos
+Content-Type: application/json
+
+{
+  "titulo": "Evento X",
+  "descripcion": "Evento temporal para pruebas",
+  "ubicacion": "Playa de Pruebas",
+  "fechaInicio": "2026-12-01T09:00:00",
+  "fechaFin": "2026-12-01T14:00:00",
+  "participantes": 10,
+  "materialNecesario": "Bolsas",
+  "categoria": { "idCategoria": 1 }
+}
+
+### 5.3 PUT: Modificar el Evento X
+PUT {{host}}/api/eventos/31
+Content-Type: application/json
+
+{
+  "titulo": "Evento X (Modificado)",
+  "participantes": 50
+}
+
+### 5.4 DELETE: Borrar el Evento X
+DELETE {{host}}/api/eventos/31
+
+
+### ==========================================
+### 6. NOTICIAS (Flujo del Registro X -> ID 31)
+### ==========================================
+
+### 6.1 Obtener todas las noticias
+GET {{host}}/api/noticias
+
+### 6.2 POST: Crear la Noticia X
+POST {{host}}/api/noticias
+Content-Type: application/json
+
+{
+  "titulo": "Noticia X",
+  "descripcion": "Noticia temporal de prueba",
+  "autor": { "id": 1 }
+}
+
+### 6.3 PUT: Modificar la Noticia X
+PUT {{host}}/api/noticias
+Content-Type: application/json
+
+{
+  "idNoticia": 31,
+  "titulo": "Noticia X (Modificada)",
+  "descripcion": "Cuerpo de la noticia editado"
+}
+
+### 6.4 DELETE: Borrar la Noticia X
+DELETE {{host}}/api/noticias/31
+
+
+### ==========================================
+### 7. CONTACTOS (Flujo del Registro X -> ID 4)
+### ==========================================
+
+### 7.1 Obtener todos los contactos
+GET {{host}}/api/contactos
+
+### 7.2 POST: Crear Contacto X
+POST {{host}}/api/contactos
+Content-Type: application/json
+
+{
+  "nombre": "Contacto X",
+  "apellidos": "De Prueba",
+  "email": "contacto.x@email.com",
+  "mensaje": "Mensaje temporal para borrar luego."
+}
+
+### 7.3 DELETE: Borrar Contacto X (No tiene PUT en el controller)
+DELETE {{host}}/api/contactos/4
+
+
+### ==========================================
+### 8. EXTRAS / ESTADÍSTICAS
+### ==========================================
+
+### 8.1 Comprobar estadísticas globales finales
+GET {{host}}/api/estadisticas/globales

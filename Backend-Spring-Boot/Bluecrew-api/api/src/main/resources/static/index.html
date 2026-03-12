@@ -1,0 +1,465 @@
+<!doctype html>
+<html>
+  <head>
+    <title>API Rest BlueCrew</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      table {
+        border: 1px solid black;
+        border-collapse: collapse;
+      }
+
+      table td,
+      table th {
+        border: 1px solid black;
+        padding: 5px 10px;
+      }
+
+      table th {
+        background-color: orange;
+      }
+
+      .cabecera {
+        font-weight: bold;
+        background-color: #dddddd;
+      }
+
+      .rotulo {
+        font-weight: bold;
+        background-color: #f2deac;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>API Rest BlueCrew</h1>
+    <table>
+      <tr>
+        <td class="rotulo">SGBD</td>
+        <td>H2 Database jdbc:h2:mem:testdb</td>
+      </tr>
+      <tr>
+        <td class="rotulo">Base de Datos</td>
+        <td>Memoria RAM</td>
+      </tr>
+      <tr>
+        <td class="rotulo">Tabla</td>
+        <td>
+          usuarios <br />
+          categorias <br />
+          eventos <br />
+          organizaciones <br />
+          noticias <br />
+          inscripciones <br />
+          recollecion_residuos <br />
+          calificaciones
+        </td>
+      </tr>
+      <tr>
+        <td class="rotulo">Content-Type</td>
+        <td>application/json</td>
+      </tr>
+      <tr>
+        <td class="rotulo">Accept</td>
+        <td>application/json</td>
+      </tr>
+    </table>
+    <br /><br />
+    <table>
+      <tr>
+        <th>MÉTODO</th>
+        <th>PATH</th>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td><a href="/api/usuarios">/api/usuarios</a></td>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td>
+          <a href="/api/usuarios/2">/api/usuarios/2</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td>
+          <a href="/api/usuarios/count">/api/usuarios/count</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td>
+          <a href="/api/usuarios/activos">/api/usuarios/activos</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="cabecera">POST</td>
+        <td>/api/usuarios</td>
+      </tr>
+      <tr>
+        <td class="cabecera">PUT</td>
+        <td>/api/usuarios</td>
+      </tr>
+      <tr>
+        <td class="cabecera">DELETE</td>
+        <td>/api/usuarios/{id}</td>
+      </tr>
+    </table>
+    <br /><br />
+    <table>
+      <tr>
+        <th>MÉTODO</th>
+        <th>PATH</th>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td><a href="/api/categorias">/api/categorias</a></td>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td>
+          <a href="/api/categorias/2">/api/categorias/2</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td>
+          <a href="/api/categorias/count">/api/categorias/count</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="cabecera">POST</td>
+        <td>/api/categorias</td>
+      </tr>
+      <tr>
+        <td class="cabecera">PUT</td>
+        <td>/api/categorias</td>
+      </tr>
+      <tr>
+        <td class="cabecera">DELETE</td>
+        <td>/api/categorias/{id}</td>
+      </tr>
+    </table>
+    <br /><br />
+    <table>
+      <tr>
+        <th>MÉTODO</th>
+        <th>PATH</th>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td><a href="/api/eventos">/api/eventos</a></td>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td>
+          <a href="/api/eventos/2">/api/eventos/2</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td>
+          <a href="/api/eventos/count">/api/eventos/count</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="cabecera">POST</td>
+        <td>/api/eventos</td>
+      </tr>
+      <tr>
+        <td class="cabecera">PUT</td>
+        <td>/api/eventos</td>
+      </tr>
+      <tr>
+        <td class="cabecera">DELETE</td>
+        <td>/api/eventos/{id}</td>
+      </tr>
+    </table>
+    <br /><br />
+    <table>
+      <tr>
+        <th>MÉTODO</th>
+        <th>PATH</th>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td><a href="/api/organizaciones">/api/organizaciones</a></td>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td>
+          <a href="/api/organizaciones/2">/api/organizaciones/2</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td>
+          <a href="/api/organizaciones/count">/api/organizaciones/count</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="cabecera">POST</td>
+        <td>/api/organizaciones</td>
+      </tr>
+      <tr>
+        <td class="cabecera">PUT</td>
+        <td>/api/organizaciones</td>
+      </tr>
+      <tr>
+        <td class="cabecera">DELETE</td>
+        <td>/api/organizaciones/{id}</td>
+      </tr>
+    </table>
+    <br /><br />
+    <table>
+      <tr>
+        <th>MÉTODO</th>
+        <th>PATH</th>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td><a href="/api/noticias">/api/noticias</a></td>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td>
+          <a href="/api/noticias/2">/api/noticias/2</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td>
+          <a href="/api/noticias/count">/api/noticias/count</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="cabecera">POST</td>
+        <td>/api/noticias</td>
+      </tr>
+      <tr>
+        <td class="cabecera">PUT</td>
+        <td>/api/noticias</td>
+      </tr>
+      <tr>
+        <td class="cabecera">DELETE</td>
+        <td>/api/noticias/{id}</td>
+      </tr>
+    </table>
+    <br /><br />
+    <table>
+      <tr>
+        <th>MÉTODO</th>
+        <th>PATH</th>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td><a href="/api/inscripciones">/api/inscripciones</a></td>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td>
+          <a href="/api/eventos/2/inscripciones">
+            /api/eventos/2/inscripciones
+          </a>
+        </td>
+      </tr>
+      <tr>
+    <td class="cabecera">GET</td>
+    <td>
+        <a href="/api/usuarios/2/inscripciones">
+            /api/usuarios/2/inscripciones
+        </a>
+    </td>
+</tr>
+<tr>
+    <td class="cabecera">GET</td>
+    <td>
+        <a href="/api/eventos/1/inscripciones">
+            /api/eventos/1/inscripciones
+        </a>
+    </td>
+</tr>
+
+<tr>
+    <td class="cabecera">GET</td>
+    <td>
+        <a href="/api/eventos/1/inscripciones/cantidad">
+            /api/eventos/1/inscripciones/cantidad
+        </a>
+    </td>
+</tr>
+
+<tr>
+    <td class="cabecera">GET</td>
+    <td>
+        <a href="/api/eventos/1/inscripciones/asistentes">
+            /api/eventos/1/inscripciones/asistentes
+        </a>
+    </td>
+</tr>
+
+<tr>
+    <td class="cabecera">GET</td>
+    <td>
+        <a href="/api/inscripciones/rankingInasistencias">
+            /api/inscripciones/rankingInasistencias
+        </a>
+    </td>
+</tr>
+
+<tr>
+    <td class="cabecera">GET</td>
+    <td>
+        <a href="/api/inscripciones/dia">
+            /api/inscripciones/dia
+        </a>
+    </td>
+</tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td>
+          <a href="/api/inscripciones/count">/api/inscripciones/count</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="cabecera">DELETE</td>
+        <td>/api/inscripciones/evento/{idEvento}/usuario/{idUsuario}</td>
+      </tr>
+    </table>
+    <br /><br />
+    <table>
+      <tr>
+        <th>MÉTODO</th>
+        <th>PATH</th>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td>
+          <a href="/api/recoleccion_residuos">/api/recoleccion_residuos</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td>
+          <a href="/api/recoleccion_residuos/1">/api/recoleccion_residuos/1</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td>
+          <a href="/api/recoleccion_residuos/total"
+            >/api/recoleccion_residuos/total</a
+          >
+        </td>
+      </tr>
+      <tr>
+        <td class="cabecera">POST</td>
+        <td>/api/recoleccion_residuos</td>
+      </tr>
+      <tr>
+        <td class="cabecera">PUT</td>
+        <td>/api/recoleccion_residuos</td>
+      </tr>
+      <tr>
+        <td class="cabecera">DELETE</td>
+        <td>/api/recoleccion_residuos/{id}</td>
+      </tr>
+    </table>
+    <br /><br />
+    <table>
+      <tr>
+        <th>MÉTODO</th>
+        <th>PATH</th>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td><a href="/api/calificaciones">/api/calificaciones</a></td>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td>
+          <a href="/api/calificaciones/usuario/2/evento/1"
+            >/api/calificaciones/usuario/2/evento/1</a
+          >
+        </td>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td>
+          <a href="/api/eventos/1/calificaciones"
+            >/api/eventos/1/calificaciones</a
+          >
+        </td>
+      </tr>
+      <tr>
+        <td class="cabecera">GET</td>
+        <td>
+          <a href="/api/calificaciones/count">/api/calificaciones/count</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="cabecera">POST</td>
+        <td>/api/calificaciones</td>
+      </tr>
+      <tr>
+        <td class="cabecera">PUT</td>
+        <td>/api/calificaciones</td>
+      </tr>
+      <tr>
+        <td class="cabecera">DELETE</td>
+        <td>/api/calificaciones/usuario/{id}/evento/{id}</td>
+      </tr>
+    </table>
+    <br /><br />
+<table>
+    <tr>
+        <th>MÉTODO</th>
+        <th>PATH</th>
+    </tr>
+    <tr>
+        <td class="cabecera">GET</td>
+        <td>
+            <a href="/api/estadisticas/globales">
+                /api/estadisticas/globales
+            </a>
+        </td>
+    </tr>
+</table>
+   <br /><br />
+    <table>
+      <tr>
+        <th>MÉTODO</th>
+        <th>PATH</th>
+      </tr>
+      <tr>
+        <td class="cabecera">POST</td>
+        <td>/api/auth/login</td>
+      </tr>
+      <tr>
+        <td class="cabecera">POST</td>
+        <td>/api/auth/logout</td>
+      </tr>
+      <tr>
+        <td class="cabecera">POST</td>
+        <td>/api/auth/register</td>
+      </tr>
+      <tr>
+        <td class="cabecera">POST</td>
+        <td>/api/auth/refresh</td>
+      </tr>
+      <tr>
+        <td class="cabecera">POST</td>
+        <td>/api/auth/forgot-password</td>
+      </tr>
+      <tr>
+        <td class="cabecera">POST</td>
+        <td>/api/auth/reset-password</td>
+      </tr>
+      <tr>
+        <td class="cabecera">POST</td>
+        <td>/api/auth/verify-email</td>
+      </tr>
+    </table>
+  </body>
+</html>

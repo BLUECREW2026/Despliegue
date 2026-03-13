@@ -5,11 +5,10 @@ services:
     container_name: spring-api
     ports:
       - "8080:8080"  # <-- IMPORTANTE: Ahora el Backend es accesible en el 8080
-    volumes:
-      # Añadido: Esto hace que las imágenes de prueba carguen y que las nuevas sean persistentes
-      - ./Backend-Spring-Boot/Bluecrew-api/uploads:/app/uploads
     networks:
       - app-network
+    volumes:
+      - uploads_volume:/app/uploads
 
   frontend:
     build: ./Frontend-React
@@ -24,3 +23,6 @@ services:
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  uploads_volume:

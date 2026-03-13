@@ -32,6 +32,7 @@ export default function Navbar() {
 
 
   useEffect(() => {
+    if (!id || id <= 0) return;
     const fetchUsuarios = async () => {
       try {
         const response = await clienteAxios.get(`/usuarios/${id}`);

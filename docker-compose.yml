@@ -3,8 +3,7 @@ services:
     build: 
       context: ./Backend-Spring-Boot/Bluecrew-api/api
     container_name: spring-api
-    ports:
-      - "8080:8080"  # <-- IMPORTANTE: Ahora el Backend es accesible en el 8080
+    # Quitamos ports: 8080:8080 para que solo Nginx hable con él
     networks:
       - app-network
     volumes:
@@ -13,9 +12,21 @@ services:
   frontend:
     build: ./Frontend-React
     container_name: react-web
-    ports:
-      - "80:80"      # <-- El Frontend (Nginx) normalmente usa el puerto 80
+    # Quitamos ports: 80:80 porque ahora el puerto 80 lo usará el Proxy
     depends_on:
+      - backend
+    networks:
+      - app-network
+
+  nginx-proxy:
+    image: nginx:alpine
+    container_name: bluecrew_proxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - frontend
       - backend
     networks:
       - app-network

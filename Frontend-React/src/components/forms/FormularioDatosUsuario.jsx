@@ -27,7 +27,7 @@ export default function Formulario_Datos_Usuario({ datosActuales, onCancelar, on
 
         try {
            
-            const response = await fetch(`http://${window.location.hostname}/api/usuarios/${userId}`, {
+            const response = await fetch(`/api/usuarios/${userId}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

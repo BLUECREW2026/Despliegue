@@ -28,8 +28,8 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     const urlLogin = tipoUsuario === "voluntario" 
-        ? `http://${window.location.hostname}/api/auth/login` 
-         : `http://${window.location.hostname}/api/organizaciones/login`;
+        ? `/api/auth/login` 
+         : `/api/organizaciones/login`;
 
     try {
       const response = await fetch(urlLogin, {
@@ -64,8 +64,8 @@ export default function Login() {
   const handleRegistro = async (e) => {
     e.preventDefault();
     const urlRegistro = tipoUsuario === "voluntario" 
-        ? `http://${window.location.hostname}/api/auth/register` 
-        : `http://${window.location.hostname}/api/organizaciones/register`;
+        ? `/api/auth/register` 
+        : `/api/organizaciones/register`;
 
     const bodyData = tipoUsuario === "voluntario" 
         ? { nombre: regNombre, apellido: regApellido, email: regEmail, password_hash: regPassword }

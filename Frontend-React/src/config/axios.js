@@ -1,9 +1,9 @@
 import axios from 'axios';
 
-const host = window.location.hostname;
+//const host = window.location.hostname;
 
-const baseURL = `http://${host}/api`;
-export const IMAGES_BASE_URL = `http://${host}/uploads/`;
+const baseURL = `/api`;
+export const IMAGES_BASE_URL = `/uploads/`;
 
 const clienteAxios = axios.create({
     // Esta es la URL de nuestro backend.

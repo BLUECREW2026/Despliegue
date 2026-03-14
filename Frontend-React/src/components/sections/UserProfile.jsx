@@ -31,7 +31,7 @@ export default function UserProfile() {
         const userId = localStorage.getItem("usuarioId") || 1;
 
         const response = await fetch(
-  `/api/usuarios/${userId}`, 
+  `/api/usuarios/${userId}`,
   {
     method: "GET",
     credentials: "include",

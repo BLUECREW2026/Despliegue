@@ -40,8 +40,10 @@ export default function Formulario_Evento() {
     titulo: '',
     descripcion: '',
     categoria: '',
-    requisitos: '',
-    fecha: '',
+    materialNecesario: '',
+    fechaInicio: '',
+    fechaFin: '',
+    participantes: 5,
     ubicacionTexto: '',
     lat: 40.4167,
     lng: -3.7037
@@ -97,16 +99,62 @@ export default function Formulario_Evento() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
+
     if (form.checkValidity() === false) {
       e.stopPropagation();
-    } else {
-      console.log("Datos del evento a enviar:", formData);
-      alert("Evento creado con éxito. Revisa la consola.");
+      form.classList.add('was-validated');
+      return;
     }
-    form.classList.add('was-validated');
+
+    try {
+      const eventoPayload = {
+        titulo: formData.titulo,
+        descripcion: formData.descripcion,
+        imagen: null,
+        ubicacion: formData.ubicacionTexto,
+        fechaInicio: formData.fechaInicio.replace('T', ' '),
+        fechaFin: formData.fechaFin.replace('T', ' '),
+        participantes: parseInt(formData.participantes),
+        materialNecesario: formData.materialNecesario,
+        categoria: {
+          idCategoria: parseInt(formData.categoria)
+        },
+        usuario: {
+          id: localStorage.getItem("usuarioId")
+        }
+      };
+
+      console.log("Enviando JSON al backend:", eventoPayload);
+
+      const response = await clienteAxios.post('/eventos', eventoPayload);
+
+      if (response.status === 201) {
+        alert("¡Evento creado con éxito!");
+
+        setFormData({
+          titulo: '',
+          descripcion: '',
+          categoria: '',
+          materialNecesario: '',
+          fechaInicio: '',
+          fechaFin: '',
+          participantes: 5,
+          ubicacionTexto: '',
+          lat: 40.4167,
+          lng: -3.7037
+        });
+
+        form.classList.remove('was-validated');
+      }
+
+    } catch (error) {
+      console.error("Error al crear el evento:", error);
+      const mensajeError = error.response?.data?.error || "Hubo un error al conectar con el servidor.";
+      alert(`Error: ${mensajeError}`);
+    }
   };
 
   return (
@@ -125,7 +173,7 @@ export default function Formulario_Evento() {
 
                 <div className="mb-3">
                   <label htmlFor="imagenEvento" className="form-label fw-bold text-secondary">Imagen:</label>
-                  <input type="file" className="form-control bg-white" id="imagenEvento" accept="image/*" required />
+                  <input type="file" className="form-control bg-white" id="imagenEvento" accept="image/*" />
                 </div>
 
                 <div className="mb-4">
@@ -155,20 +203,31 @@ export default function Formulario_Evento() {
                     </select>
                   </div>
                   <div className="col-md-6 mb-3">
-                    <label htmlFor="fecha" className="form-label fw-bold text-secondary">Fecha:</label>
-                    <input type="date" className="form-control bg-white" id="fecha" required value={formData.fecha} onChange={handleInputChange} />
+                    <label htmlFor="participantes" className="form-label fw-bold text-secondary">Participantes (Mín. 5):</label>
+                    <input type="number" className="form-control bg-white" id="participantes" min="5" required value={formData.participantes} onChange={handleInputChange} />
+                  </div>
+                </div>
+
+                <div className="row">
+                  <div className="col-md-6 mb-3">
+                    <label htmlFor="fechaInicio" className="form-label fw-bold text-secondary">Fecha y Hora de Inicio:</label>
+                    <input type="datetime-local" className="form-control bg-white" id="fechaInicio" required value={formData.fechaInicio} onChange={handleInputChange} />
+                  </div>
+                  <div className="col-md-6 mb-3">
+                    <label htmlFor="fechaFin" className="form-label fw-bold text-secondary">Fecha y Hora de Fin:</label>
+                    <input type="datetime-local" className="form-control bg-white" id="fechaFin" required value={formData.fechaFin} onChange={handleInputChange} />
                   </div>
                 </div>
 
                 <div className="mb-4">
-                  <label htmlFor="requisitos" className="form-label fw-bold text-secondary">Requisitos:</label>
+                  <label htmlFor="materialNecesario" className="form-label fw-bold text-secondary">Material Necesitario:</label>
                   <input
                     type="text"
                     className="form-control bg-white"
-                    id="requisitos"
+                    id="materialNecesario"
                     placeholder="Ej: Traer guantes..."
                     required
-                    value={formData.requisitos}
+                    value={formData.materialNecesario}
                     onChange={handleInputChange}
                   />
                 </div>

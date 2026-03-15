@@ -4,10 +4,12 @@ import mios from "../../assets/img/profile/cards/mios.jpg";
 import FormularioDatosUsuario from "../forms/FormularioDatosUsuario";
 import { Link } from "react-router-dom";
 import { IMAGES_BASE_URL } from "../../config/axios";
+import LoginModal from "./CrearEventoModal";
 
 export default function UserProfile() {
   const [modoEdicion, setModoEdicion] = useState(false);
   const [cargando, setCargando] = useState(true);
+  const [showModal, setShowModal] = useState(false);
 
   const [userData, setUserData] = useState({
     nombre: "",
@@ -21,7 +23,7 @@ export default function UserProfile() {
 
   const obtenerImagen = (nombreImagen) => {
     if (!nombreImagen) return profilePhoto;
-    if (nombreImagen.startsWith('http')) return nombreImagen;
+    if (nombreImagen.startsWith("http")) return nombreImagen;
     return `${IMAGES_BASE_URL}${nombreImagen}`;
   };
 
@@ -30,14 +32,11 @@ export default function UserProfile() {
       try {
         const userId = localStorage.getItem("usuarioId");
 
-        const response = await fetch(
-  `/api/usuarios/${userId}`,
-  {
+        const response = await fetch(`/api/usuarios/${userId}`, {
           method: "GET",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
-  },
-);
+        });
 
         if (response.ok) {
           const datosReales = await response.json();
@@ -50,7 +49,7 @@ export default function UserProfile() {
             bio: datosReales.biografia || "Sin biografia ",
             eventosCompletados: datosReales.eventosCompletados || 0,
             imagen: datosReales.foto || "",
-            timestamp: Date.now()
+            timestamp: Date.now(),
           });
         } else {
           console.error("Error: El servidor respondió pero no con OK.");
@@ -89,7 +88,10 @@ export default function UserProfile() {
               alt="Foto de perfil"
               className="rounded-circle border border-3 border-white shadow-sm mb-4"
               style={{ width: "160px", height: "160px", objectFit: "cover" }}
-              onError={(e) => { e.target.onerror = null; e.target.src = profilePhoto; }}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = profilePhoto;
+              }}
             />
             <button
               onClick={() => setModoEdicion(true)}
@@ -107,23 +109,27 @@ export default function UserProfile() {
                 <span>{userData.nombre}</span>
               </div>
               <div className="d-flex align-items-baseline">
-                <p className="text-secondary fw-semibold me-2 mb-0">Apellidos:</p>
+                <p className="text-secondary fw-semibold me-2 mb-0">
+                  Apellidos:
+                </p>
                 <span>{userData.apellidos}</span>
               </div>
               <div className="d-flex align-items-baseline">
-                <p className="text-secondary fw-semibold me-2 mb-0">Correo Electrónico:</p>
+                <p className="text-secondary fw-semibold me-2 mb-0">
+                  Correo Electrónico:
+                </p>
                 <span>{userData.email}</span>
               </div>
               <div className="d-flex align-items-baseline">
-                <p className="text-secondary fw-semibold me-2 mb-0">Localidad:</p>
+                <p className="text-secondary fw-semibold me-2 mb-0">
+                  Localidad:
+                </p>
                 <span>{userData.localidad}</span>
               </div>
             </div>
 
             <div className="border-top pt-4">
-              <h5 className="mb-3 text-secondary fw-bold">
-                Biografía
-              </h5>
+              <h5 className="mb-3 text-secondary fw-bold">Biografía</h5>
               <p className="lh-base mb-0">{userData.bio}</p>
             </div>
           </div>
@@ -181,6 +187,7 @@ export default function UserProfile() {
               alt="crear evento"
             />
           </div>
+
           <div className="mt-auto text-center">
             {userData.eventosCompletados >= 5 ? (
               <Link
@@ -190,20 +197,15 @@ export default function UserProfile() {
                 Crear Evento
               </Link>
             ) : (
-              <div>
-                <span
-                  className="d-block mb-2 text-danger fw-bold"
-                  style={{ fontSize: "0.85rem" }}
-                >
-                  Necesitas participar en {5 - userData.eventosCompletados} eventos más
-                </span>
-                <Link
-                  to="/eventos/crear"
-                  className="btn btn-primary text-light fw-bold w-100 rounded-3 py-2 disabled"
+              <>
+                <button
+                  type="button"
+                  className="btn btn-primary text-light fw-bold w-100 rounded-3 py-2"
+                  onClick={() => setShowModal(true)}
                 >
                   Crear Evento
-                </Link>
-              </div>
+                </button>
+              </>
             )}
           </div>
         </div>
@@ -232,6 +234,7 @@ export default function UserProfile() {
           </div>
         </div>
       </div>
+      <LoginModal open={showModal} setOpenModal={setShowModal} mensaje={`¡Casi puedes crear tu evento! Te falta participar en ${5 - userData.eventosCompletados} eventos más para desbloquear esta función.`} />
     </section>
   );
 }

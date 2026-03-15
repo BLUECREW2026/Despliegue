@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import emailjs from '@emailjs/browser';
 import "./LoginRegistro.scss";
 import videoFondo from "../../assets/login/video-fondo.mp4";
 import { Home } from "lucide-react";
@@ -41,6 +42,7 @@ export default function Login() {
       const data = await response.json();
       
       if (response.ok) {
+        localStorage.setItem("email", email);
         localStorage.setItem("isLogged", "true");
         localStorage.setItem("rol", tipoUsuario === "voluntario" ? "USER" : "ONG");
         
@@ -85,12 +87,33 @@ export default function Login() {
         body: JSON.stringify(bodyData),
         credentials: "include",
       });
-      const data = await response.json();
 
       if (response.ok) {
-        alert(`¡Registro exitoso! Ahora puedes iniciar sesión.`);
+          alert(`¡Registro exitoso! Ahora puedes iniciar sesión.`);
+        // --- CONFIGURACIÓN BLUE CREW ---
+        const serviceID = "service_jde23sl"; 
+        const templateID = "template_thpbvke"; // El que empieza por template_
+        const publicKey = "XRltpFrVtfWnjbjMO";   // El de la sección Account
+
+        const templateParams = {
+          to_name: tipoUsuario === "voluntario" ? regNombre : regNombreOrg,
+          user_email: regEmail, // Asegúrate de que en "To Email" de la web pusiste {{user_email}}
+          company_name: "Blue Crew",
+          support_email: "soporte@bluecrew.com"
+        };
+
+        emailjs.send(serviceID, templateID, templateParams, publicKey)
+          .then(() => {
+            console.log("Correo de Blue Crew enviado con éxito");
+          })
+          .catch((err) => {
+            console.error("Error al enviar el correo:", err);
+          });
+
+        alert(`¡Registro en Blue Crew exitoso! Revisa tu bandeja de entrada.`);
         setRegistrado(false); 
       } else {
+        const data = await response.json();
         alert("Error: " + (data.error || data.message || "Error al registrar"));
       }
     } catch (error) {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import { Icon } from "leaflet";
+import clienteAxios from "../../config/axios";
 
 import "leaflet/dist/leaflet.css";
 import "leaflet-geosearch/dist/geosearch.css";
@@ -46,22 +47,40 @@ export default function Formulario_Evento() {
     lng: -3.7037
   });
 
+  const [categorias, setCategorias] = useState([]);
+
+  useEffect(() => {
+    const fetchCategorias = async () => {
+      try {
+        const response = await clienteAxios.get("/categorias");
+
+        const dataMapeada = response.data.map(cat => ({
+          id: cat.idCategoria,
+          nombre: cat.nombreCategoria
+        }));
+
+        setCategorias(dataMapeada);
+      } catch (error) {
+        console.error("Error al obtener las categorias:", error);
+      }
+    };
+
+    fetchCategorias();
+  }, []);
+
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  // Función cuando se busca en el buscador de Leaflet-Geosearch
   const handleLocationFound = (label, lat, lng) => {
     setFormData(prev => ({ ...prev, ubicacionTexto: label, lat, lng }));
   };
 
-  // Función cuando se hace click en el mapa (Geocodificación Inversa)
+  // Función para recibir la localización con las coordenadas
   const handleMapClick = async (lat, lng) => {
-    // Actualizamos coordenadas para mover el marcador rápido
     setFormData(prev => ({ ...prev, lat, lng }));
 
     try {
-      // Consultamos a Nominatim para obtener la dirección del punto clicado
       const response = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
       );
@@ -101,49 +120,74 @@ export default function Formulario_Evento() {
 
                 <div className="mb-3">
                   <label htmlFor="titulo" className="form-label fw-bold text-secondary">Título:</label>
-                  <input type="text" className="form-control" id="titulo" required value={formData.titulo} onChange={handleInputChange} />
+                  <input type="text" className="form-control bg-white" id="titulo" required value={formData.titulo} onChange={handleInputChange} />
                 </div>
 
                 <div className="mb-3">
                   <label htmlFor="imagenEvento" className="form-label fw-bold text-secondary">Imagen:</label>
-                  <input type="file" className="form-control" id="imagenEvento" accept="image/*" required />
+                  <input type="file" className="form-control bg-white" id="imagenEvento" accept="image/*" required />
                 </div>
 
                 <div className="mb-4">
                   <label htmlFor="descripcion" className="form-label fw-bold text-secondary">Descripción:</label>
-                  <textarea className="form-control" id="descripcion" rows={4} required value={formData.descripcion} onChange={handleInputChange}></textarea>
+                  <textarea className="form-control bg-white" id="descripcion" rows={4} required value={formData.descripcion} onChange={handleInputChange}></textarea>
                 </div>
 
                 <div className="row">
                   <div className="col-md-6 mb-3">
-                    <label htmlFor="categoria" className="form-label fw-bold text-secondary">Categoría:</label>
-                    <select id="categoria" className="form-select" required value={formData.categoria} onChange={handleInputChange}>
+                    <label htmlFor="categoria" className="form-label fw-bold text-secondary">
+                      Categoría:
+                    </label>
+                    <select
+                      id="categoria"
+                      name="categoria"
+                      className="form-select"
+                      required
+                      value={formData.categoria}
+                      onChange={handleInputChange}
+                    >
                       <option value="" disabled>Selecciona una...</option>
-                      <option value="playa">Playa</option>
-                      <option value="rio">Río</option>
-                      <option value="costa">Costa</option>
+                      {categorias.map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                          {cat.nombre}
+                        </option>
+                      ))}
                     </select>
                   </div>
                   <div className="col-md-6 mb-3">
                     <label htmlFor="fecha" className="form-label fw-bold text-secondary">Fecha:</label>
-                    <input type="date" className="form-control" id="fecha" required value={formData.fecha} onChange={handleInputChange} />
+                    <input type="date" className="form-control bg-white" id="fecha" required value={formData.fecha} onChange={handleInputChange} />
                   </div>
                 </div>
 
                 <div className="mb-4">
-                  <label htmlFor="ubicacionTexto" className="form-label fw-bold text-primary">Ubicación:</label>
+                  <label htmlFor="requisitos" className="form-label fw-bold text-secondary">Requisitos:</label>
                   <input
                     type="text"
-                    className="form-control mb-3"
+                    className="form-control bg-white"
+                    id="requisitos"
+                    placeholder="Ej: Traer guantes..."
+                    required
+                    value={formData.requisitos}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label htmlFor="ubicacionTexto" className="form-label fw-bold text-primary">
+                    <i className="bi bi-geo-alt-fill me-2"></i>Ubicación:</label>
+                  <input
+                    type="text"
+                    className="form-control bg-white mb-3"
                     id="ubicacionTexto"
-                    placeholder="Dirección seleccionada..."
+                    placeholder="Busca en el mapa o escribe la dirección"
                     required
                     value={formData.ubicacionTexto}
                     onChange={handleInputChange}
                   />
 
-                  <div className="shadow-sm rounded-3 overflow-hidden border border-2 border-primary" style={{ height: "350px" }}>
-                    <MapContainer center={[formData.lat, formData.lng]} zoom={13} style={{ height: "100%", width: "100%" }}>
+                  <div className="shadow-sm rounded-3 overflow-hidden border border-2 border-primary">
+                    <MapContainer center={[formData.lat, formData.lng]} zoom={13}>
                       <ChangeView center={[formData.lat, formData.lng]} />
                       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
@@ -155,7 +199,7 @@ export default function Formulario_Evento() {
                   </div>
                 </div>
 
-                <button type="submit" className="btn btn-secondary col-12 py-3 fw-bold">PUBLICAR EVENTO</button>
+                <button type="submit" className="btn btn-secondary col-12 py-3 fw-bold shadow-sm">PUBLICAR EVENTO</button>
               </form>
             </div>
           </div>

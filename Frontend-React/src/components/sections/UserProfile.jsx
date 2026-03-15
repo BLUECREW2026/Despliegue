@@ -33,9 +33,9 @@ export default function UserProfile() {
         const response = await fetch(
   `/api/usuarios/${userId}`,
   {
-    method: "GET",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
+          method: "GET",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
   },
 );
 
@@ -188,13 +188,22 @@ export default function UserProfile() {
                 className="btn btn-primary text-light fw-bold w-100 rounded-3 py-2"
               >
                 Crear Evento
-              </Link>) : (
-              <Link
-                to="/eventos/crear"
-                className="btn btn-primary text-light fw-bold w-100 rounded-3 py-2 disabled"
-              >
-                Crear Evento
               </Link>
+            ) : (
+              <div>
+                <span
+                  className="d-block mb-2 text-danger fw-bold"
+                  style={{ fontSize: "0.85rem" }}
+                >
+                  Necesitas participar en {5 - userData.eventosCompletados} eventos más
+                </span>
+                <Link
+                  to="/eventos/crear"
+                  className="btn btn-primary text-light fw-bold w-100 rounded-3 py-2 disabled"
+                >
+                  Crear Evento
+                </Link>
+              </div>
             )}
           </div>
         </div>

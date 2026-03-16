@@ -34,7 +34,6 @@ export default function UserProfile() {
   useEffect(() => {
     const obtenerDatos = async () => {
       try {
-        F;
         const esONG = rol === "ONG";
         const id = esONG
           ? localStorage.getItem("ongId")

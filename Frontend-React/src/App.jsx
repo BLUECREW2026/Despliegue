@@ -1,8 +1,4 @@
-import {
-  Routes,
-  Route,
-  Outlet,
-} from "react-router-dom";
+import { Routes, Route, Outlet } from "react-router-dom";
 import "./App.scss";
 import Navbar from "./components/common/nav/Nav";
 import Footer from "./components/common/Footer";
@@ -15,8 +11,8 @@ import Privacidad from "./pages/Privacidad";
 import DetalleEvento from "./pages/Evento";
 import Eventos from "./pages/Eventos";
 import { useState, useEffect, useCallback } from "react";
-import clienteAxios from "./config/axios"
-import { formatearFechaHora } from "./utilities/formatearFechaHora"
+import clienteAxios from "./config/axios";
+import { formatearFechaHora } from "./utilities/formatearFechaHora";
 import Cookies from "./pages/Cookies";
 import AvisoLegal from "./pages/AvisoLegal";
 import Noticias from "./pages/Noticias";
@@ -25,7 +21,7 @@ import CrearEvento from "./pages/CrearEvento";
 import Login from "./pages/Login/LoginRegistro";
 import SobreNosotros from "./pages/SobreNosotros";
 import PagOng from "./pages/Ong";
-import CalificarEvento from "./components/forms/CalificarEvento/CalificarEvento"
+import CalificarEvento from "./components/forms/CalificarEvento/CalificarEvento";
 
 const MainLayout = ({ refrescarEventos }) => {
   return (
@@ -46,12 +42,12 @@ function App() {
       const usuarioId = localStorage.getItem("usuarioId");
 
       if (!usuarioId) {
-        response = await clienteAxios.get('/eventos/activos');
+        response = await clienteAxios.get("/eventos/activos");
       } else {
-        response = await clienteAxios.get('/eventos/activos/' + usuarioId);
+        response = await clienteAxios.get("/eventos/activos/" + usuarioId);
       }
 
-      const eventosFormateados = response.data.map(item => {
+      const eventosFormateados = response.data.map((item) => {
         const { fecha, hora } = formatearFechaHora(item[4]);
         return {
           id: item[0],
@@ -64,13 +60,13 @@ function App() {
           descripcionCategoria: item[6],
           material: item[7],
           ubicacion: item[8],
-          participantes: item[9]
+          participantes: item[9],
         };
       });
 
       setDatos(eventosFormateados);
     } catch (error) {
-      console.error('Error al obtener los datos:', error);
+      console.error("Error al obtener los datos:", error);
     }
   }, []);
 
@@ -80,7 +76,6 @@ function App() {
   return (
     <div className="d-flex flex-column min-vh-100">
       <Routes>
-
         <Route element={<MainLayout refrescarEventos={obtenerDatos} />}>
           <Route path="/" element={<Home datos={datos} />} />
           <Route path="/mis-eventos" element={<MisEventos />} />
@@ -97,7 +92,10 @@ function App() {
           <Route path="/sobre-nosotros" element={<SobreNosotros />} />
           <Route path="/eventos/crear" element={<CrearEvento />} />
           <Route path="/ong" element={<PagOng />} />
-          <Route path="/participaciones/calificar-evento/:id" element={<CalificarEvento />} />
+          <Route
+            path="/participaciones/calificar-evento/:id"
+            element={<CalificarEvento />}
+          />
           <Route
             path="*"
             element={
@@ -107,7 +105,6 @@ function App() {
         </Route>
 
         <Route path="/login" element={<Login />} />
-
       </Routes>
     </div>
   );

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import emailjs from '@emailjs/browser';
+import emailjs from "@emailjs/browser";
 import "./LoginRegistro.scss";
 import videoFondo from "../../assets/login/video-fondo.mp4";
 import { Home } from "lucide-react";
@@ -28,9 +28,10 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const urlLogin = tipoUsuario === "voluntario" 
-        ? `/api/auth/login` 
-         : `/api/organizaciones/login`;
+    const urlLogin =
+      tipoUsuario === "voluntario"
+        ? `/api/auth/login`
+        : `/api/organizaciones/login`;
 
     try {
       const response = await fetch(urlLogin, {
@@ -40,23 +41,34 @@ export default function Login() {
         credentials: "include",
       });
       const data = await response.json();
-      
+
       if (response.ok) {
         localStorage.setItem("email", email);
         localStorage.setItem("isLogged", "true");
-        localStorage.setItem("rol", tipoUsuario === "voluntario" ? "USER" : "ONG");
-        
+        localStorage.setItem(
+          "rol",
+          tipoUsuario === "voluntario" ? "USER" : "ONG",
+        );
+
         if (tipoUsuario === "voluntario") {
-            localStorage.setItem("usuarioId", data.id);
-            localStorage.setItem("user", JSON.stringify(data.user));
+          localStorage.setItem("rol", "USER");
+          localStorage.setItem("usuarioId", data.id);
+          localStorage.setItem("user", JSON.stringify(data));
+        
         } else {
-            localStorage.setItem("ongId", data.id);
-            localStorage.setItem("ongData", JSON.stringify(data.ong || data.user));
+          localStorage.setItem("rol", "ONG");
+        
+        
+        const idCorrecto = data.idOrganizacion || data.id_organizacion || data.id;
+        
+        localStorage.setItem("ongId", idCorrecto); 
+        
         }
-        navigate("/");
+       window.location.href = "/";
       } else {
         alert("Error: " + (data.message || "Credenciales incorrectas"));
       }
+      
     } catch (error) {
       console.error("Error completo:", error);
       alert("No se pudo conectar con el servidor");
@@ -65,19 +77,26 @@ export default function Login() {
 
   const handleRegistro = async (e) => {
     e.preventDefault();
-    const urlRegistro = tipoUsuario === "voluntario" 
-        ? `/api/auth/register` 
+    const urlRegistro =
+      tipoUsuario === "voluntario"
+        ? `/api/auth/register`
         : `/api/organizaciones/register`;
 
-    const bodyData = tipoUsuario === "voluntario" 
-        ? { nombre: regNombre, apellido: regApellido, email: regEmail, password_hash: regPassword }
-        : { 
-            nombreOrganizacion: regNombreOrg, 
-            email: regEmail, 
-            passwordHash: regPassword,        
-            telefono: regTelefono, 
-            sitioWeb: regSitioWeb,            
-            descripcion: regDescripcion 
+    const bodyData =
+      tipoUsuario === "voluntario"
+        ? {
+            nombre: regNombre,
+            apellido: regApellido,
+            email: regEmail,
+            password_hash: regPassword,
+          }
+        : {
+            nombreOrganizacion: regNombreOrg,
+            email: regEmail,
+            passwordHash: regPassword,
+            telefono: regTelefono,
+            sitioWeb: regSitioWeb,
+            descripcion: regDescripcion,
           };
 
     try {
@@ -89,20 +108,20 @@ export default function Login() {
       });
 
       if (response.ok) {
-          alert(`¡Registro exitoso! Ahora puedes iniciar sesión.`);
-        // --- CONFIGURACIÓN BLUE CREW ---
-        const serviceID = "service_jde23sl"; 
-        const templateID = "template_thpbvke"; // El que empieza por template_
-        const publicKey = "XRltpFrVtfWnjbjMO";   // El de la sección Account
+        alert(`¡Registro exitoso! Ahora puedes iniciar sesión.`) 
+        const serviceID = "service_jde23sl";
+        const templateID = "template_thpbvke"; 
+        const publicKey = "XRltpFrVtfWnjbjMO"; 
 
         const templateParams = {
           to_name: tipoUsuario === "voluntario" ? regNombre : regNombreOrg,
-          user_email: regEmail, // Asegúrate de que en "To Email" de la web pusiste {{user_email}}
+          user_email: regEmail, 
           company_name: "Blue Crew",
-          support_email: "soporte@bluecrew.com"
+          support_email: "soporte@bluecrew.com",
         };
 
-        emailjs.send(serviceID, templateID, templateParams, publicKey)
+        emailjs
+          .send(serviceID, templateID, templateParams, publicKey)
           .then(() => {
             console.log("Correo de Blue Crew enviado con éxito");
           })
@@ -111,7 +130,7 @@ export default function Login() {
           });
 
         alert(`¡Registro en Blue Crew exitoso! Revisa tu bandeja de entrada.`);
-        setRegistrado(false); 
+        setRegistrado(false);
       } else {
         const data = await response.json();
         alert("Error: " + (data.error || data.message || "Error al registrar"));
@@ -123,70 +142,161 @@ export default function Login() {
 
   return (
     <div className="login-page-wrapper">
-      
       <Link to="/" className="boton volver-inicio ">
         <Home size={24} />
         <span>Inicio</span>
       </Link>
 
-      <video autoPlay loop muted playsInline className="video-fondo" src={videoFondo} />
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="video-fondo"
+        src={videoFondo}
+      />
 
       <div className="login principal mt-4">
-        <div className={`login container ${registrado ? "active" : ""}`} id="container">
-          
+        <div
+          className={`login container ${registrado ? "active" : ""}`}
+          id="container"
+        >
           <div className="panel panel-izquierdo">
-            
             <h2>{registrado ? "Bienvenido" : "Crea tu cuenta"}</h2>
-            <p>{registrado ? "Inicia sesión para continuar" : "Únete a nuestra comunidad"}</p>
+            <p>
+              {registrado
+                ? "Inicia sesión para continuar"
+                : "Únete a nuestra comunidad"}
+            </p>
             <button onClick={toggleForm}>
               {registrado ? "Ir a Login" : "Ir a Registro"}
             </button>
           </div>
 
           <div className="panel panel-derecho">
-            
             <form className="form login" onSubmit={handleLogin}>
-              
               <h2>LOGIN</h2>
               <div className="botones-tipo-usuario">
-                <button type="button" className={tipoUsuario === "voluntario" ? "activa" : ""} onClick={() => setTipoUsuario("voluntario")}>Voluntario</button>
-                <button type="button" className={tipoUsuario === "ong" ? "activa" : ""} onClick={() => setTipoUsuario("ong")}>ONG</button>
+                <button
+                  type="button"
+                  className={tipoUsuario === "voluntario" ? "activa" : ""}
+                  onClick={() => setTipoUsuario("voluntario")}
+                >
+                  Voluntario
+                </button>
+                <button
+                  type="button"
+                  className={tipoUsuario === "ong" ? "activa" : ""}
+                  onClick={() => setTipoUsuario("ong")}
+                >
+                  ONG
+                </button>
               </div>
-              
 
-              <input type="email" placeholder={tipoUsuario === "ong" ? "Email de la organización" : "Email"} value={email} onChange={(e) => setEmail(e.target.value)} required />
-              <input type="password" placeholder="Contraseña" value={password} onChange={(e) => setPassword(e.target.value)} required />
-              <button type="submit" className="btn-submit">Iniciar Sesión</button>
+              <input
+                type="email"
+                placeholder={
+                  tipoUsuario === "ong" ? "Email de la organización" : "Email"
+                }
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <input
+                type="password"
+                placeholder="Contraseña"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button type="submit" className="btn-submit">
+                Iniciar Sesión
+              </button>
             </form>
 
-         
             <form className="form registro" onSubmit={handleRegistro}>
-              <h2 >REGISTRO</h2>
+              <h2>REGISTRO</h2>
 
               <div className="botones-tipo-usuario">
-                <button type="button" className={tipoUsuario === "voluntario" ? "activa" : ""} onClick={() => setTipoUsuario("voluntario")}>Voluntario</button>
-                <button type="button" className={tipoUsuario === "ong" ? "activa" : ""} onClick={() => setTipoUsuario("ong")}>ONG</button>
+                <button
+                  type="button"
+                  className={tipoUsuario === "voluntario" ? "activa" : ""}
+                  onClick={() => setTipoUsuario("voluntario")}
+                >
+                  Voluntario
+                </button>
+                <button
+                  type="button"
+                  className={tipoUsuario === "ong" ? "activa" : ""}
+                  onClick={() => setTipoUsuario("ong")}
+                >
+                  ONG
+                </button>
               </div>
-              
+
               {tipoUsuario === "voluntario" ? (
                 <>
-                  <input type="text" placeholder="Nombre" value={regNombre} onChange={(e) => setRegNombre(e.target.value)} required />
-                  <input type="text" placeholder="Apellido" value={regApellido} onChange={(e) => setRegApellido(e.target.value)} required />
+                  <input
+                    type="text"
+                    placeholder="Nombre"
+                    value={regNombre}
+                    onChange={(e) => setRegNombre(e.target.value)}
+                    required
+                  />
+                  <input
+                    type="text"
+                    placeholder="Apellido"
+                    value={regApellido}
+                    onChange={(e) => setRegApellido(e.target.value)}
+                    required
+                  />
                 </>
               ) : (
                 <>
-                  <input type="text" placeholder="Nombre de la Organización" value={regNombreOrg} onChange={(e) => setRegNombreOrg(e.target.value)} required />
-                  
-                    <input type="text" placeholder="Teléfono" value={regTelefono} onChange={(e) => setRegTelefono(e.target.value)} required />
-                    <input type="url" placeholder="Sitio Web (Opcional)" value={regSitioWeb} onChange={(e) => setRegSitioWeb(e.target.value)} />
-                  
+                  <input
+                    type="text"
+                    placeholder="Nombre de la Organización"
+                    value={regNombreOrg}
+                    onChange={(e) => setRegNombreOrg(e.target.value)}
+                    required
+                  />
+
+                  <input
+                    type="text"
+                    placeholder="Teléfono"
+                    value={regTelefono}
+                    onChange={(e) => setRegTelefono(e.target.value)}
+                    required
+                  />
+                  <input
+                    type="url"
+                    placeholder="Sitio Web (Opcional)"
+                    value={regSitioWeb}
+                    onChange={(e) => setRegSitioWeb(e.target.value)}
+                  />
                 </>
               )}
 
-              <input type="email" placeholder={tipoUsuario === "ong" ? "Email corporativo" : "Email"} value={regEmail} onChange={(e) => setRegEmail(e.target.value)} required />
-              <input type="password" placeholder="Contraseña" value={regPassword} onChange={(e) => setRegPassword(e.target.value)} required />
-              
-              <button type="submit" className="btn-submit">Crear Cuenta</button>
+              <input
+                type="email"
+                placeholder={
+                  tipoUsuario === "ong" ? "Email corporativo" : "Email"
+                }
+                value={regEmail}
+                onChange={(e) => setRegEmail(e.target.value)}
+                required
+              />
+              <input
+                type="password"
+                placeholder="Contraseña"
+                value={regPassword}
+                onChange={(e) => setRegPassword(e.target.value)}
+                required
+              />
+
+              <button type="submit" className="btn-submit">
+                Crear Cuenta
+              </button>
             </form>
           </div>
         </div>

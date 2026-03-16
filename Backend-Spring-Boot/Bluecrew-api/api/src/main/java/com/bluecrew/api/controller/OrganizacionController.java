@@ -95,6 +95,16 @@ public class OrganizacionController {
         return response;
     }
 
+
+    @GetMapping("/{id}")
+public ResponseEntity<Organizacion> getOrganizacion(@PathVariable int id) {
+    Organizacion org = organizacionService.findById(id);
+    if (org == null) {
+        return ResponseEntity.notFound().build();
+    }
+    return ResponseEntity.ok(org);
+}
+
     // ***************************************************************************
     // ACTUALIZACIONES
     // ***************************************************************************

@@ -12,11 +12,11 @@ export default function Navbar() {
   const [isLogged, setIsLogged] = useState(
     localStorage.getItem("isLogged") === "true",
   );
+  const [rol, setRol] = useState(localStorage.getItem("rol"));
   const logout = () => {
-    localStorage.removeItem("isLogged");
-    localStorage.removeItem("user");
-    localStorage.removeItem("usuarioId");
+    localStorage.clear(); 
     setIsLogged(false);
+    setRol(null);
     window.location.href = "/";
   };
 
@@ -30,6 +30,7 @@ export default function Navbar() {
   const [usuarios, setUsuarios] = useState([]);
   const id = Number(localStorage.getItem("usuarioId"));
 
+  
 
   useEffect(() => {
     if (!id || id <= 0) return;

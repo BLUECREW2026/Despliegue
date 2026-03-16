@@ -11,15 +11,7 @@ export default function UserProfile() {
   const [cargando, setCargando] = useState(true);
   const [showModal, setShowModal] = useState(false);
 
-  const [userData, setUserData] = useState({
-    nombre: "",
-    apellidos: "",
-    email: "",
-    localidad: "",
-    bio: "",
-    eventosCompletados: 0,
-    imagen: "",
-  });
+  const rol = localStorage.getItem("rol");
 
   const obtenerImagen = (nombreImagen) => {
     if (!nombreImagen) return profilePhoto;
@@ -27,42 +19,71 @@ export default function UserProfile() {
     return `${IMAGES_BASE_URL}${nombreImagen}`;
   };
 
-  useEffect(() => {
-    const obtenerDatosDelUsuario = async () => {
-      try {
-        const userId = localStorage.getItem("usuarioId");
+  const [userData, setUserData] = useState({
+    nombre: "",
+    email: "",
+    localidad: "",
+    bio: "",
+    imagen: "",
+    eventosCompletados: 0,
 
-        const response = await fetch(`/api/usuarios/${userId}`, {
+    telefono: "",
+    sitioWeb: "",
+  });
+
+  useEffect(() => {
+    const obtenerDatos = async () => {
+      try {
+        F;
+        const esONG = rol === "ONG";
+        const id = esONG
+          ? localStorage.getItem("ongId")
+          : localStorage.getItem("usuarioId");
+        const endpoint = esONG
+          ? `/api/organizaciones/${id}`
+          : `/api/usuarios/${id}`;
+
+        const response = await fetch(endpoint, {
           method: "GET",
           credentials: "include",
           headers: { "Content-Type": "application/json" },
         });
 
         if (response.ok) {
-          const datosReales = await response.json();
+          const datos = await response.json();
 
-          setUserData({
-            nombre: datosReales.nombre || "",
-            apellidos: datosReales.apellido || "",
-            email: datosReales.email || "",
-            localidad: datosReales.localidad || "sin ubicacion",
-            bio: datosReales.biografia || "Sin biografia ",
-            eventosCompletados: datosReales.eventosCompletados || 0,
-            imagen: datosReales.foto || "",
-            timestamp: Date.now(),
-          });
-        } else {
-          console.error("Error: El servidor respondió pero no con OK.");
+          if (esONG) {
+            setUserData({
+              nombre: datos.nombreOrganizacion || "",
+              email: datos.email || "",
+              localidad: datos.localidad || "Sin ubicación",
+              bio: datos.descripcion || "Sin biografía",
+              imagen: datos.logo || "",
+              telefono: datos.telefono || "",
+              sitioWeb: datos.sitioWeb || "",
+              eventosCompletados: 999,
+            });
+          } else {
+            setUserData({
+              nombre: datos.nombre || "",
+              apellidos: datos.apellido || "",
+              email: datos.email || "",
+              localidad: datos.localidad || "Sin ubicación",
+              bio: datos.biografia || "Sin biografía",
+              eventosCompletados: datos.eventosCompletados || 0,
+              imagen: datos.foto || "",
+            });
+          }
         }
       } catch (error) {
-        console.error("Error de conexión:", error);
+        console.error("Error al obtener datos:", error);
       } finally {
         setCargando(false);
       }
     };
 
-    obtenerDatosDelUsuario();
-  }, []);
+    obtenerDatos();
+  }, [rol]);
 
   if (cargando) {
     return (
@@ -81,7 +102,6 @@ export default function UserProfile() {
       )}
       <div className="card shadow rounded-4 p-4 p-md-5 bg-white border-0">
         <div className="row">
-          {/* Columna Izquierda: Foto y Botón */}
           <div className="col-md-4 d-flex flex-column align-items-center mb-4 mb-md-0">
             <img
               src={obtenerImagen(userData.imagen)}
@@ -101,42 +121,48 @@ export default function UserProfile() {
             </button>
           </div>
 
-          {/* Columna Derecha: Datos y Biografía */}
           <div className="col-md-8 ps-md-4">
             <div className="d-flex flex-column gap-2 mb-4">
               <div className="d-flex align-items-baseline">
-                <p className="text-secondary fw-semibold me-2 mb-0">Nombre:</p>
-                <span>{userData.nombre}</span>
-              </div>
-              <div className="d-flex align-items-baseline">
                 <p className="text-secondary fw-semibold me-2 mb-0">
-                  Apellidos:
+                  {rol === "ONG" ? "Organización:" : "Nombre:"}
                 </p>
-                <span>{userData.apellidos}</span>
+                <span>
+                  {userData.nombre} {userData.apellidos || ""}
+                </span>
               </div>
+
+              {rol === "ONG" && (
+                <>
+                  <div className="d-flex align-items-baseline">
+                    <p className="text-secondary fw-semibold me-2 mb-0">
+                      Teléfono:
+                    </p>
+                    <span>{userData.telefono}</span>
+                  </div>
+                  <div className="d-flex align-items-baseline">
+                    <p className="text-secondary fw-semibold me-2 mb-0">Web:</p>
+                    <a href={userData.sitioWeb}>{userData.sitioWeb}</a>
+                  </div>
+                </>
+              )}
+
               <div className="d-flex align-items-baseline">
-                <p className="text-secondary fw-semibold me-2 mb-0">
-                  Correo Electrónico:
-                </p>
+                <p className="text-secondary fw-semibold me-2 mb-0">Correo:</p>
                 <span>{userData.email}</span>
-              </div>
-              <div className="d-flex align-items-baseline">
-                <p className="text-secondary fw-semibold me-2 mb-0">
-                  Localidad:
-                </p>
-                <span>{userData.localidad}</span>
               </div>
             </div>
 
             <div className="border-top pt-4">
-              <h5 className="mb-3 text-secondary fw-bold">Biografía</h5>
+              <h5 className="mb-3 text-secondary fw-bold">
+                {rol === "ONG" ? "Sobre nosotros" : "Biografía"}
+              </h5>
               <p className="lh-base mb-0">{userData.bio}</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Modal de edicion de datos personales superpuesto */}
       {modoEdicion && (
         <FormularioDatosUsuario
           datosActuales={userData}
@@ -234,7 +260,11 @@ export default function UserProfile() {
           </div>
         </div>
       </div>
-      <LoginModal open={showModal} setOpenModal={setShowModal} mensaje={`¡Casi puedes crear tu evento! Te falta participar en ${5 - userData.eventosCompletados} eventos más para desbloquear esta función.`} />
+      <LoginModal
+        open={showModal}
+        setOpenModal={setShowModal}
+        mensaje={`¡Casi puedes crear tu evento! Te falta participar en ${5 - userData.eventosCompletados} eventos más para desbloquear esta función.`}
+      />
     </section>
   );
 }

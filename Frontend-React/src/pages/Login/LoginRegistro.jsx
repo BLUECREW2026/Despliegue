@@ -41,7 +41,7 @@ export default function Login() {
 
     if (form.checkValidity() === false) {
       e.stopPropagation();
-      setValidated(true);
+      setValidado(true);
       return;
     }
 
@@ -106,7 +106,6 @@ export default function Login() {
 
       if (response.ok) {
         setExito("¡Registro completado! Revisa tu correo.");
-        
         emailjs.send("service_jde23sl", "template_thpbvke", {
           to_name: tipoUsuario === "voluntario" ? regNombre : regNombreOrg,
           user_email: regEmail,
@@ -148,6 +147,7 @@ export default function Login() {
           </div>
 
           <div className="panel panel-derecho">
+            {/* LOGIN FORM */}
             <form className={`form login needs-validation ${validado ? 'was-validated' : ''}`} noValidate onSubmit={handleLogin}>
               <h2>LOGIN</h2>
               <div className="botones-tipo-usuario mb-3">
@@ -170,6 +170,7 @@ export default function Login() {
               <button type="submit" className="btn-submit">Iniciar Sesión</button>
             </form>
 
+            {/* REGISTRO FORM */}
             <form className={`form registro needs-validation ${validado ? 'was-validated' : ''}`} noValidate onSubmit={handleRegistro}>
               <h2>REGISTRO</h2>
               <div className="botones-tipo-usuario mb-3">

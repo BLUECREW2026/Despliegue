@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-export default function CrearEventoModal({ open, setOpenModal, mensaje}) {
+export default function CrearEventoModal({ open, setOpenModal, mensaje, ruta}) {
     const navigate = useNavigate();
     if (!open) return null;
 
@@ -14,7 +14,7 @@ export default function CrearEventoModal({ open, setOpenModal, mensaje}) {
             <div className="bg-white shadow w-25 border rounded p-3">
                 <p className="text-primary text-center">{mensaje}
                 </p>
-                <button className="btn btn-primary text-light fw-bold w-100" onClick={() => navigate("/eventos")}>
+                <button className="btn btn-primary text-light fw-bold w-100" onClick={() => navigate(ruta)}>
                     Ver eventos
                 </button>
             </div>

@@ -263,6 +263,7 @@ export default function UserProfile() {
         open={showModal}
         setOpenModal={setShowModal}
         mensaje={`¡Casi puedes crear tu evento! Te falta participar en ${5 - userData.eventosCompletados} eventos más para desbloquear esta función.`}
+        ruta="/eventos"
       />
     </section>
   );

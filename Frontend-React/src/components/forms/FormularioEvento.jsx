@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet';
 import { Icon } from "leaflet";
 import clienteAxios from "../../config/axios";
+import CrearEventoModal from "../sections/CrearEventoModal"; 
 
 import "leaflet/dist/leaflet.css";
 import "leaflet-geosearch/dist/geosearch.css";
@@ -36,6 +37,9 @@ function ClickHandler({ onMapClick }) {
 }
 
 export default function Formulario_Evento() {
+  const [showModal, setShowModal] = useState(false);
+  const [modalConfig, setModalConfig] = useState({ mensaje: '', ruta: '' });
+
   const [formData, setFormData] = useState({
     titulo: '',
     descripcion: '',
@@ -147,7 +151,11 @@ export default function Formulario_Evento() {
       const response = await clienteAxios.post('/eventos', formDataToSend);
 
       if (response.status === 201) {
-        alert("¡Evento creado con éxito!");
+        setModalConfig({
+          mensaje: "¡Evento creado con éxito!",
+          ruta: "/mis-eventos"
+        });
+        setShowModal(true);
 
         setFormData({
           titulo: '',
@@ -168,14 +176,23 @@ export default function Formulario_Evento() {
       }
 
     } catch (error) {
-      console.error("Error al crear el evento:", error);
-      const mensajeError = error.response?.data?.error || "Hubo un error al conectar con el servidor.";
-      alert(`Error: ${mensajeError}`);
+      setModalConfig({
+        mensaje: error.response?.data?.error || "Error al crear el evento.",
+        ruta: ""
+      });
+      setShowModal(true);
     }
   };
 
   return (
     <div className="container">
+      <CrearEventoModal 
+        open={showModal} 
+        setOpenModal={setShowModal} 
+        mensaje={modalConfig.mensaje} 
+        ruta={modalConfig.ruta} 
+      />
+
       <div className="row justify-content-center mb-5 mt-5">
         <div className="col-lg-8 col-md-10">
           <div className="card contact-card bg-light p-4 p-md-5 border-0 shadow rounded-4">

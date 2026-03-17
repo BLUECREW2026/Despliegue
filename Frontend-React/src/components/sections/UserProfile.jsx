@@ -126,9 +126,19 @@ export default function UserProfile() {
                 <p className="text-secondary fw-semibold me-2 mb-0">
                   {rol === "ONG" ? "Organización:" : "Nombre:"}
                 </p>
-                <span>
-                  {userData.nombre} {userData.apellidos || ""}
-                </span>
+                <span>{userData.nombre}</span>
+              </div>
+
+              {rol !== "ONG" && (
+                <div className="d-flex align-items-baseline">
+                  <p className="text-secondary fw-semibold me-2 mb-0">Apellidos:</p>
+                  <span>{userData.apellidos || ""}</span>
+                </div>
+              )}
+
+              <div className="d-flex align-items-baseline">
+                <p className="text-secondary fw-semibold me-2 mb-0">Localidad:</p>
+                <span>{userData.localidad}</span>
               </div>
 
               {rol === "ONG" && (
@@ -167,7 +177,7 @@ export default function UserProfile() {
           datosActuales={userData}
           onCancelar={() => setModoEdicion(false)}
           onGuardar={(datosNuevos) => {
-            setUserData(datosNuevos);
+            setUserData((prev) => ({ ...prev, ...datosNuevos }));
             setModoEdicion(false);
           }}
         />

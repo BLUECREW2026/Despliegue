@@ -1,13 +1,13 @@
 import { useState } from "react";
 
 export default function Formulario_Datos_Usuario({ datosActuales, onCancelar, onGuardar }) {
-    
+
     const rol = localStorage.getItem("rol");
     const esONG = rol === "ONG";
 
     const [formData, setFormData] = useState({
         nombre: datosActuales.nombre || "",
-        apellidos: datosActuales.apellidos || "", 
+        apellidos: datosActuales.apellidos || "",
         email: datosActuales.email || "",
         localidad: datosActuales.localidad || "",
         bio: datosActuales.bio || "",
@@ -23,32 +23,33 @@ export default function Formulario_Datos_Usuario({ datosActuales, onCancelar, on
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault(); 
-        
-        
+        e.preventDefault();
+
+
         const id = esONG ? localStorage.getItem("ongId") : localStorage.getItem("usuarioId");
         const endpoint = esONG ? `/api/organizaciones/${id}` : `/api/usuarios/${id}`;
 
-        
+
         const bodyData = esONG ? {
             nombreOrganizacion: formData.nombre,
             descripcion: formData.bio,
             email: formData.email,
             telefono: formData.telefono,
-            sitioWeb: formData.sitioWeb
+            sitioWeb: formData.sitioWeb,
+            localidad: formData.localidad
         } : {
             nombre: formData.nombre,
             apellido: formData.apellidos,
             email: formData.email,
-            biografia: formData.bio
-            
+            biografia: formData.bio,
+            localidad: formData.localidad
         };
 
         try {
             const response = await fetch(endpoint, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                credentials: "include", 
+                credentials: "include",
                 body: JSON.stringify(bodyData),
             });
 
@@ -71,7 +72,7 @@ export default function Formulario_Datos_Usuario({ datosActuales, onCancelar, on
                     <div className="card-body">
                         <form className="needs-validation" noValidate onSubmit={handleSubmit}>
                             <h3 className="mb-4 text-primary">{esONG ? "Editar Perfil Institucional" : "Editar Datos Personales"}</h3>
-                            
+
                             {errorMsg && <div className="alert alert-danger">{errorMsg}</div>}
 
                             <div className="row">

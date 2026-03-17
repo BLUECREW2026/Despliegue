@@ -8,22 +8,33 @@ import clienteAxios, { IMAGES_BASE_URL } from "../../../config/axios";
 export default function DesplegableUsuario({ onLogout }) {
   const [usuarios, setUsuarios] = useState([]);
   const [imgError, setImgError] = useState(false);
-
-const id = Number(localStorage.getItem("usuarioId"));
+  
+  const ongId = localStorage.getItem("ongId");
+  const usuarioId = localStorage.getItem("usuarioId");
 
   useEffect(() => {
     const fetchUsuarios = async () => {
       try {
-        const response = await clienteAxios.get(`/usuarios/${id}`);
-        setUsuarios(response.data);
+        let endpoint = "";
+        if (ongId) {
+          endpoint = `/organizaciones/${ongId}`;
+        } else if (usuarioId) {
+          endpoint = `/usuarios/${usuarioId}`;
+        }
+
+        if (endpoint) {
+          const response = await clienteAxios.get(endpoint);
+          setUsuarios(response.data);
+        }
       } catch (error) {
-        console.error("Error al obtener los usuarios:", error);
+        console.error("Error al obtener los datos:", error);
       }
     };
 
     fetchUsuarios();
-  }, [id]);
- 
+  }, [ongId, usuarioId]);
+
+  const fotoAMostrar = ongId ? usuarios.logo : usuarios.foto;
 
   return (
     <div className="dropdown d-flex align-items-center">
@@ -33,9 +44,9 @@ const id = Number(localStorage.getItem("usuarioId"));
         data-bs-toggle="dropdown"
         aria-expanded="false"
       >
-        {usuarios?.foto && !imgError ? (
+        {fotoAMostrar && !imgError ? (
           <img
-            src={usuarios.foto.startsWith('http') ? usuarios.foto : `${IMAGES_BASE_URL}${usuarios.foto}?t=${Date.now()}`}
+            src={fotoAMostrar.startsWith('http') ? fotoAMostrar : `${IMAGES_BASE_URL}${fotoAMostrar}?t=${Date.now()}`}
             alt="Foto perfil"
             className="rounded-circle object-fit-cover"
             style={{ width: "36px", height: "36px" }}
@@ -63,7 +74,7 @@ const id = Number(localStorage.getItem("usuarioId"));
             <i className="bi bi-calendar-event"></i> Mis Eventos
           </Link>
         </li>
-        {usuarios.eventosCompletados >= 5 ? (
+        {(ongId || usuarios.eventos_completados >= 5) ? (
          <li>
           <Link
             className="dropdown-item d-flex align-items-center gap-2 py-2 text-secondary"

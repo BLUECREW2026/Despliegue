@@ -13,10 +13,13 @@ export default function Navbar() {
     localStorage.getItem("isLogged") === "true",
   );
   const [rol, setRol] = useState(localStorage.getItem("rol"));
+  const [datosPerfil, setDatosPerfil] = useState(null);
+  
   const logout = () => {
     localStorage.clear(); 
     setIsLogged(false);
     setRol(null);
+    setDatosPerfil(null);
     window.location.href = "/";
   };
 
@@ -27,24 +30,28 @@ export default function Navbar() {
     }
   };
 
-  const [usuarios, setUsuarios] = useState([]);
-  const id = Number(localStorage.getItem("usuarioId"));
+  const ongId = localStorage.getItem("ongId");
+  const usuarioId = localStorage.getItem("usuarioId");
 
-  
-
-  useEffect(() => {
-    if (!id || id <= 0) return;
-    const fetchUsuarios = async () => {
+useEffect(() => {
+    const fetchDatos = async () => {
       try {
-        const response = await clienteAxios.get(`/usuarios/${id}`);
-        setUsuarios(response.data);
+        if (ongId) {
+          // Es una Organización (Tabla organizaciones)
+          const response = await clienteAxios.get(`/organizaciones/${ongId}`);
+          setDatosPerfil(response.data);
+        } else if (usuarioId) {
+          // Es un Usuario (Tabla usuarios)
+          const response = await clienteAxios.get(`/usuarios/${usuarioId}`);
+          setDatosPerfil(response.data);
+        }
       } catch (error) {
-        console.error("Error al obtener los usuarios:", error);
+        console.error("Error al obtener datos:", error);
       }
     };
 
-    fetchUsuarios();
-  }, [id]);
+    if (isLogged) fetchDatos();
+  }, [isLogged, ongId, usuarioId]);
 
   return (
     <>
@@ -150,7 +157,7 @@ export default function Navbar() {
                     role="button"
                     aria-expanded="false"
                   >
-                    Usuario
+                    {ongId ? datosPerfil?.nombreOrganizacion : datosPerfil?.nombre}
                     <i className="bi bi-chevron-down small"></i>
                   </a>
 
@@ -174,7 +181,7 @@ export default function Navbar() {
                           Mis Eventos
                         </Link>
                       </li>
-                      {usuarios.eventosCompletados >= 5 ? (<li>
+                      {(ongId || datosPerfil?.eventos_completados >= 5) ? (<li>
                         <Link
                           className="nav-link text-white-50"
                           to="/eventos/crear"

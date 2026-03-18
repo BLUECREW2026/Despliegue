@@ -32,6 +32,7 @@ export default function Navbar() {
 
   const ongId = localStorage.getItem("ongId");
   const usuarioId = localStorage.getItem("usuarioId");
+  const esONG = Boolean(ongId);
 
 useEffect(() => {
     const fetchDatos = async () => {
@@ -196,6 +197,7 @@ useEffect(() => {
                         >
                           Crear Evento
                         </Link>}
+                        {!esONG &&
                       <li>
                         <Link
                           className="nav-link text-white-50"
@@ -204,7 +206,7 @@ useEffect(() => {
                         >
                           Participaciones
                         </Link>
-                      </li>
+                      </li>}
                       <li>
                         <Link
                           className="nav-link text-danger"

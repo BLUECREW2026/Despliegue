@@ -264,7 +264,7 @@ export default function UserProfile() {
               to="/participaciones"
               className="btn btn-primary text-light fw-bold w-100 rounded-3 py-2"
             >
-              historico
+              Historial
             </Link>
           </div>
         </div>

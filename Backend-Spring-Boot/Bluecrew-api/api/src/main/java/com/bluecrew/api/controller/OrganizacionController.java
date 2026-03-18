@@ -219,6 +219,8 @@ public ResponseEntity<Organizacion> getOrganizacion(@PathVariable int id) {
                     existingObj.setSitioWeb(org.getSitioWeb());
                 if (org.getLogo() != null)
                     existingObj.setLogo(org.getLogo());
+                if (org.getLocalidad() != null)
+                    existingObj.setLocalidad(org.getLocalidad());
                 if (org.getPasswordHash() != null)
                     existingObj.setPasswordHash(org.getPasswordHash());
                 if (org.getTelefono() != null)

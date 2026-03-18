@@ -67,6 +67,11 @@ public class Usuario {
       @Column(name = "foto", nullable = true, unique = false)
       private String foto;
 
+      @Schema(description = "Localidad del usuario", example = "Madrid")
+      @Size(max = 100, message = "La localidad no puede tener más de 100 caracteres")
+      @Column(name = "localidad", nullable = true, unique = false)
+      private String localidad;
+
       @Column(name = "CREAR_EVENTO")
       private Boolean crearEvento = false;
 

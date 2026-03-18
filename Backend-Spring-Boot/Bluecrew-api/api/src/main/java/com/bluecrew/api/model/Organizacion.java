@@ -48,6 +48,10 @@ public class Organizacion {
     @Column(name = "logo", length = 100, nullable = true)
     private String logo;
 
+    @Schema(description = "Localidad de la organización", example = "Barcelona")
+    @Column(name = "localidad", length = 100, nullable = true)
+    private String localidad;
+
     @Schema(description = "Contraseña encriptada de la organización")
     @Column(name = "password_hash", nullable = false, length = 255)
     private String passwordHash;

@@ -64,6 +64,7 @@ public class UsuarioController {
         map.put("email", usuario.getEmail());
         map.put("biografia", usuario.getBiografia());
         map.put("foto", usuario.getFoto());
+        map.put("localidad", usuario.getLocalidad());
         map.put("rol", usuario.getRol());
 
         map.put("eventosCompletados", usuario.getEventosCompletados());
@@ -199,6 +200,9 @@ public class UsuarioController {
         }
         if (userUpdate.getFoto() != null) {
             existingUser.setFoto(userUpdate.getFoto());
+        }
+        if (userUpdate.getLocalidad() != null) {
+            existingUser.setLocalidad(userUpdate.getLocalidad());
         }
         if (userUpdate.getRol() != null) {
             existingUser.setRol(userUpdate.getRol());

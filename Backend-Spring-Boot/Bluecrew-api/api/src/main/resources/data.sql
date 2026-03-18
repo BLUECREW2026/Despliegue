@@ -4,10 +4,10 @@
 INSERT INTO USUARIOS (ROL, PASSWORD_HASH, CREAR_EVENTO, NOMBRE, APELLIDO, EMAIL, BIOGRAFIA, FOTO, ACTIVO, EVENTOS_COMPLETADOS)
 VALUES 
     ('ADMIN', '$2a$08$w8YA1SgyKTLh2AWyYC4OEOUy.zorUciUJbC7zetBKfmNAdZ0nEtiC', TRUE, 'Pepe', 'Garcia', 'pepe@bluecrew.com', 'Administrador', 'pepe.jpg', TRUE, 5),
-    ('USER', '$2a$08$w8YA1SgyKTLh2AWyYC4OEOUy.zorUciUJbC7zetBKfmNAdZ0nEtiC', FALSE, 'Ana', 'Lopez', 'ana@gmail.com', 'Voluntaria', 'ana.jpg', TRUE, 2),
-    ('USER', '$2a$08$w8YA1SgyKTLh2AWyYC4OEOUy.zorUciUJbC7zetBKfmNAdZ0nEtiC', FALSE, 'Carlos', 'Ruiz', 'carlos@gmail.com', 'Buceador', 'carlos.jpg', TRUE, 12),
-    ('USER', '$2a$08$w8YA1SgyKTLh2AWyYC4OEOUy.zorUciUJbC7zetBKfmNAdZ0nEtiC', FALSE, 'Elena', 'Mora', 'elena@yahoo.es', 'Bióloga', 'elena.jpg', TRUE, 8),
-    ('ADMIN', '$2a$08$w8YA1SgyKTLh2AWyYC4OEOUy.zorUciUJbC7zetBKfmNAdZ0nEtiC', TRUE, 'Marta', 'Sanz', 'marta@bluecrew.com', 'Staff', 'marta.jpg', TRUE, 25),
+    ('USER', '$2a$08$w8YA1SgyKTLh2AWyYC4OEOUy.zorUciUJbC7zetBKfmNAdZ0nEtiC', FALSE, 'Ana', 'Lopez', 'ana@gmail.com', 'Voluntaria', 'ana.jpg', TRUE, 4),
+    ('USER', '$2a$08$w8YA1SgyKTLh2AWyYC4OEOUy.zorUciUJbC7zetBKfmNAdZ0nEtiC', FALSE, 'Carlos', 'Ruiz', 'carlos@gmail.com', 'Buceador', 'carlos.jpg', TRUE, 5),
+    ('USER', '$2a$08$w8YA1SgyKTLh2AWyYC4OEOUy.zorUciUJbC7zetBKfmNAdZ0nEtiC', FALSE, 'Elena', 'Mora', 'elena@yahoo.es', 'Bióloga', 'elena.jpg', TRUE, 1),
+    ('ADMIN', '$2a$08$w8YA1SgyKTLh2AWyYC4OEOUy.zorUciUJbC7zetBKfmNAdZ0nEtiC', TRUE, 'Marta', 'Sanz', 'marta@bluecrew.com', 'Staff', 'marta.jpg', TRUE, 0),
     ('USER', '$2a$08$w8YA1SgyKTLh2AWyYC4OEOUy.zorUciUJbC7zetBKfmNAdZ0nEtiC', FALSE, 'Javi', 'Pons', 'javi@gmail.com', 'Surfista', 'u6.jpg', TRUE, 4),
     ('USER', '$2a$08$w8YA1SgyKTLh2AWyYC4OEOUy.zorUciUJbC7zetBKfmNAdZ0nEtiC', FALSE, 'Sofia', 'C.', 'sofi@gmail.com', 'Fotógrafa', 'u7.jpg', TRUE, 15),
     ('USER', '$2a$08$w8YA1SgyKTLh2AWyYC4OEOUy.zorUciUJbC7zetBKfmNAdZ0nEtiC', FALSE, 'Luis', 'Gómez', 'luis@gmail.com', 'Estudiante', 'u8.jpg', TRUE, 1),
@@ -107,7 +107,7 @@ VALUES
     (1, 'Bio-Construcción', 'Materiales marinos', TRUE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 -- ======================================================
--- 4. EVENTOS - CORREGIDO (Incluye ID_ORGANIZACION como NULL explícito)
+-- 4. EVENTOS 
 -- ======================================================
 INSERT INTO EVENTOS (ID_CATEGORIA, ID_USER, ID_ORGANIZACION, TITULO, DESCRIPCION, IMAGEN, FECHA_INICIO, FECHA_FIN, UBICACION, ESTADO, PARTICIPANTES, FINALIZADO, MATERIAL_NECESARIO)
 VALUES 
@@ -255,19 +255,18 @@ VALUES
 INSERT INTO INSCRIPCIONES (ID_EVENTO, ID_USUARIO, ASISTIO)
 VALUES 
     (1, 1, TRUE),
-    (1, 3, TRUE),
+    (1, 2, TRUE),
     (1, 4, TRUE),
     (2, 5, FALSE),
-    (3, 6, TRUE),
+    (3, 2, TRUE),
     (3, 7, TRUE),
     (4, 1, TRUE),
-    (5, 8, TRUE),
+    (5, 2, TRUE),
     (6, 9, TRUE),
     (7, 10, FALSE),
     (8, 11, TRUE),
     (9, 12, TRUE),
-    (10, 13, TRUE),
-    (11, 14, TRUE),
+    (10, 2, TRUE),
     (12, 15, TRUE),
     (13, 16, TRUE),
     (14, 17, TRUE),
@@ -277,7 +276,7 @@ VALUES
     (18, 21, TRUE),
     (19, 22, TRUE),
     (20, 23, TRUE),
-    (21, 24, TRUE),
+    (21, 2, TRUE),
     (22, 25, TRUE),
     (23, 26, TRUE),
     (24, 27, TRUE),

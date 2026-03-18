@@ -181,7 +181,7 @@ useEffect(() => {
                           Mis Eventos
                         </Link>
                       </li>
-                      {(ongId || datosPerfil?.eventos_completados >= 5) ? (<li>
+                      {(ongId || datosPerfil?.eventosCompletados >= 5) ? (<li>
                         <Link
                           className="nav-link text-white-50"
                           to="/eventos/crear"

@@ -68,7 +68,7 @@
 .login {
   .container {
     width: 900px;
-    height: 580px;
+    height: 680px;
 
     display: flex;
     border-radius: 40px;
@@ -252,6 +252,10 @@
       font-size: 0.8rem !important;
     }
   }
+  .w-100{
+    width: 100%;
+    height: 14% !important;
+  }
 
   .login-page-wrapper {
     display: flex !important;
@@ -259,10 +263,11 @@
     justify-content: center;
     height: 100vh;
     
-    padding: 15px;
+    padding: 14px !important;
 
     .login.principal {
       width: 100%;
+      height: auto !important;
       margin-top: 40px !important;
     }
 
@@ -270,7 +275,7 @@
       width: 100% !important;
       max-width: 380px !important;
       height: auto !important;
-      min-height: 750px !important;
+      min-height: 700px !important;
       display: flex !important;
       flex-direction: column !important;
       overflow: hidden !important;
@@ -278,8 +283,8 @@
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
 
       h2 {
-        font-size: 20px !important;
-        margin-bottom: 5px !important;
+        font-size: 18px !important;
+        margin-bottom: 2px !important;
       }
 
       &.active {
@@ -319,8 +324,8 @@
       border-radius: 0 0 40px 40px !important;
 
       h2 {
-        font-size: 25px !important;
-        margin-bottom: 10px !important;
+        font-size: 15px !important;
+        margin-bottom: 7px !important;
       }
     }
 
@@ -337,7 +342,7 @@
     padding: 40px 15px !important;
     display: flex !important;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     opacity: 1;
     transition: opacity 0.4s ease;
 
@@ -349,8 +354,8 @@
     button[type="submit"] {
       background: white !important;
       color: black !important;
-      padding: 15px !important;
-      margin-top: 5px;
+      padding: 10px !important;
+      margin-top: 3px;
     }
 
     &.registro {

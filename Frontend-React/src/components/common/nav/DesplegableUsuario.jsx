@@ -74,7 +74,7 @@ export default function DesplegableUsuario({ onLogout }) {
             <i className="bi bi-calendar-event"></i> Mis Eventos
           </Link>
         </li>
-        {(ongId || usuarios.eventos_completados >= 5) ? (
+        {(ongId || usuarios.eventosCompletados >= 5) ? (
          <li>
           <Link
             className="dropdown-item d-flex align-items-center gap-2 py-2 text-secondary"

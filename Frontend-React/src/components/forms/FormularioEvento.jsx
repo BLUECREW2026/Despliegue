@@ -115,6 +115,8 @@ export default function Formulario_Evento() {
     }
 
     try {
+      const ongId = localStorage.getItem("ongId");
+
       const eventoPayload = {
         titulo: formData.titulo,
         descripcion: formData.descripcion,
@@ -127,9 +129,16 @@ export default function Formulario_Evento() {
         categoria: {
           idCategoria: parseInt(formData.categoria)
         },
-        usuario: {
-          id: localStorage.getItem("usuarioId")
-        }
+        usuario: localStorage.getItem("usuarioId") 
+        ? { id: localStorage.getItem("usuarioId") } 
+        : null,
+
+        organizacion: ongId 
+            ? { idOrganizacion: ongId } 
+            : null,
+
+        ...(ongId && { estadoEvento: "APROBADO" })
+        
       };
 
       // Uso de FormData para empaquetar los datos y la imagen

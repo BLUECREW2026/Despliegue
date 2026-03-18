@@ -34,6 +34,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api")
@@ -95,15 +101,14 @@ public class OrganizacionController {
         return response;
     }
 
-
     @GetMapping("/{id}")
-public ResponseEntity<Organizacion> getOrganizacion(@PathVariable int id) {
-    Organizacion org = organizacionService.findById(id);
-    if (org == null) {
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<Organizacion> getOrganizacion(@PathVariable int id) {
+        Organizacion org = organizacionService.findById(id);
+        if (org == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(org);
     }
-    return ResponseEntity.ok(org);
-}
 
     // ***************************************************************************
     // ACTUALIZACIONES
@@ -113,9 +118,10 @@ public ResponseEntity<Organizacion> getOrganizacion(@PathVariable int id) {
     // INSERT (POST)
     // http://localhost:8080/api/organizaciones
     @Operation(summary = "Crea una organización", description = "Inserta una organización en la base de datos")
-    @PostMapping("/organizaciones")
+    @PostMapping(value = "/organizaciones", consumes = { "multipart/form-data" })
     public ResponseEntity<Map<String, Object>> create(
-            @Valid @RequestBody Organizacion org) {
+            @Valid @RequestPart("organizacion") Organizacion org,
+            @RequestPart(value = "imagen", required = false) MultipartFile imagen) {
 
         ResponseEntity<Map<String, Object>> response;
 
@@ -127,6 +133,26 @@ public ResponseEntity<Organizacion> getOrganizacion(@PathVariable int id) {
                     .status(HttpStatus.BAD_REQUEST)
                     .body(map);
         } else {
+            if (imagen != null && !imagen.isEmpty()) {
+                try {
+                    String uploadDir = "uploads/";
+                    Path uploadPath = Paths.get(uploadDir);
+                    if (!Files.exists(uploadPath)) {
+                        Files.createDirectories(uploadPath);
+                    }
+
+                    String originalFilename = imagen.getOriginalFilename();
+                    Path filePath = uploadPath.resolve(originalFilename);
+                    Files.write(filePath, imagen.getBytes());
+
+                    org.setLogo(originalFilename);
+                } catch (IOException e) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("error", "No se pudo guardar la imagen: " + e.getMessage());
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(map);
+                }
+            }
+
             if (org.getNombreOrganizacion() == null || org.getNombreOrganizacion().trim().isEmpty() ||
                     org.getEmail() == null || org.getEmail().trim().isEmpty() ||
                     org.getPasswordHash() == null || org.getPasswordHash().trim().isEmpty() ||
@@ -187,56 +213,77 @@ public ResponseEntity<Organizacion> getOrganizacion(@PathVariable int id) {
     // UPDATE (PUT)
     // http://localhost:8080/api/organizaciones
     @Operation(summary = "Actualiza los datos de una organización", description = "Recibe datos nuevos para actualizar una organización ya existente")
-    @PutMapping("/organizaciones")
+    @PutMapping(value = "/organizaciones/{id}", consumes = { "multipart/form-data" })
     public ResponseEntity<Map<String, Object>> update(
-            @Valid @RequestBody Organizacion org) {
+            @PathVariable int id,
+            @RequestPart(value = "organizacion", required = false) Organizacion org,
+            @RequestPart(value = "imagen", required = false) MultipartFile imagen) {
 
         ResponseEntity<Map<String, Object>> response;
 
-        if (org == null) {
+        if (org == null && imagen == null) {
             Map<String, Object> map = new HashMap<>();
             map.put("error", "El cuerpo de la solicitud no puede estar vacío");
-
             response = ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
         } else {
-            int id = org.getIdOrganizacion(); 
             Organizacion existingObj = organizacionService.findById(id);
 
             if (existingObj == null) {
                 Map<String, Object> map = new HashMap<>();
                 map.put("error", "Organización no encontrada");
                 map.put("id", id);
-
                 response = ResponseEntity.status(HttpStatus.NOT_FOUND).body(map);
             } else {
 
-                
-                if (org.getNombreOrganizacion() != null)
-                    existingObj.setNombreOrganizacion(org.getNombreOrganizacion());
-                if (org.getDescripcion() != null)
-                    existingObj.setDescripcion(org.getDescripcion());
-                if (org.getSitioWeb() != null)
-                    existingObj.setSitioWeb(org.getSitioWeb());
-                if (org.getLogo() != null)
-                    existingObj.setLogo(org.getLogo());
-                if (org.getLocalidad() != null)
-                    existingObj.setLocalidad(org.getLocalidad());
-                if (org.getPasswordHash() != null)
-                    existingObj.setPasswordHash(org.getPasswordHash());
-                if (org.getTelefono() != null)
-                    existingObj.setTelefono(org.getTelefono());
-                if (org.getEmail() != null)
-                    existingObj.setEmail(org.getEmail());
+                if (imagen != null && !imagen.isEmpty()) {
+                    try {
+                        String uploadDir = "uploads/";
+                        Path uploadPath = Paths.get(uploadDir);
+                        if (!Files.exists(uploadPath)) {
+                            Files.createDirectories(uploadPath);
+                        }
 
-                if (org.getEstadoAprobacion() != null) {
-                    existingObj.setEstadoAprobacion(org.getEstadoAprobacion());
-                    if (org.getEstadoAprobacion() == com.bluecrew.api.model.EstadoAprobacionOrganizacion.APROBADO
-                            && existingObj.getFechaAprobacion() == null) {
-                        existingObj.setFechaAprobacion(java.time.LocalDateTime.now());
+                        String originalFilename = imagen.getOriginalFilename();
+                        Path filePath = uploadPath.resolve(originalFilename);
+                        Files.write(filePath, imagen.getBytes());
+
+                        existingObj.setLogo(originalFilename);
+                    } catch (IOException e) {
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("error", "No se pudo guardar la nueva imagen: " + e.getMessage());
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(map);
                     }
                 }
-                if (org.getAprobadoPor() != null)
-                    existingObj.setAprobadoPor(org.getAprobadoPor());
+
+                if (org != null) {
+
+                    if (org.getNombreOrganizacion() != null)
+                        existingObj.setNombreOrganizacion(org.getNombreOrganizacion());
+                    if (org.getDescripcion() != null)
+                        existingObj.setDescripcion(org.getDescripcion());
+                    if (org.getSitioWeb() != null)
+                        existingObj.setSitioWeb(org.getSitioWeb());
+                    if (org.getLogo() != null)
+                        existingObj.setLogo(org.getLogo());
+                    if (org.getLocalidad() != null)
+                        existingObj.setLocalidad(org.getLocalidad());
+                    if (org.getPasswordHash() != null)
+                        existingObj.setPasswordHash(org.getPasswordHash());
+                    if (org.getTelefono() != null)
+                        existingObj.setTelefono(org.getTelefono());
+                    if (org.getEmail() != null)
+                        existingObj.setEmail(org.getEmail());
+
+                    if (org.getEstadoAprobacion() != null) {
+                        existingObj.setEstadoAprobacion(org.getEstadoAprobacion());
+                        if (org.getEstadoAprobacion() == com.bluecrew.api.model.EstadoAprobacionOrganizacion.APROBADO
+                                && existingObj.getFechaAprobacion() == null) {
+                            existingObj.setFechaAprobacion(java.time.LocalDateTime.now());
+                        }
+                    }
+                    if (org.getAprobadoPor() != null)
+                        existingObj.setAprobadoPor(org.getAprobadoPor());
+                }
 
                 Organizacion objPut = organizacionService.save(existingObj);
 
@@ -280,20 +327,31 @@ public ResponseEntity<Organizacion> getOrganizacion(@PathVariable int id) {
         return response;
     }
 
-
-
-
     @Operation(summary = "Registro específico para ONG", description = "Registra una ONG encriptando su contraseña")
-    @PostMapping("/organizaciones/register")
-    public ResponseEntity<Map<String, Object>> registerOng(@Valid @RequestBody Organizacion org) {
+    @PostMapping(value = "/organizaciones/register", consumes = { "multipart/form-data" })
+    public ResponseEntity<Map<String, Object>> registerOng(
+            @Valid @RequestPart("organizacion") Organizacion org,
+            @RequestPart(value = "imagen", required = false) MultipartFile imagen) {
         Map<String, Object> response = new HashMap<>();
 
         try {
-           
+            if (imagen != null && !imagen.isEmpty()) {
+                String uploadDir = "uploads/";
+                Path uploadPath = Paths.get(uploadDir);
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath);
+                }
+
+                String originalFilename = imagen.getOriginalFilename();
+                Path filePath = uploadPath.resolve(originalFilename);
+                Files.write(filePath, imagen.getBytes());
+
+                org.setLogo(originalFilename);
+            }
+
             String hashPassword = passwordEncoder.encode(org.getPasswordHash());
             org.setPasswordHash(hashPassword);
 
-           
             Organizacion nuevaOrg = organizacionService.save(org);
 
             response.put("mensaje", "Organización registrada con éxito");
@@ -306,7 +364,6 @@ public ResponseEntity<Organizacion> getOrganizacion(@PathVariable int id) {
         }
     }
 
-
     @Operation(summary = "Login para ONG", description = "Inicia sesión buscando en la tabla de organizaciones")
     @PostMapping("/organizaciones/login")
     public ResponseEntity<Map<String, Object>> loginOng(
@@ -317,22 +374,18 @@ public ResponseEntity<Organizacion> getOrganizacion(@PathVariable int id) {
             String email = credentials.get("email");
             String password = credentials.get("password");
 
-           
             Optional<Organizacion> org = organizacionService.findByEmail(email);
 
-            
             if (org.isPresent() && passwordEncoder.matches(password, org.get().getPasswordHash())) {
 
-                
                 Organizacion organizacionReal = org.get();
 
-                
                 List<GrantedAuthority> authorities = new ArrayList<>();
                 authorities.add(new SimpleGrantedAuthority("ROLE_ONG"));
 
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(email, null, authorities);
+                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(email, null,
+                        authorities);
 
-               
                 SecurityContext context = SecurityContextHolder.createEmptyContext();
                 context.setAuthentication(auth);
                 SecurityContextHolder.setContext(context);
@@ -341,13 +394,12 @@ public ResponseEntity<Organizacion> getOrganizacion(@PathVariable int id) {
                         HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                         context);
 
-                
                 Map<String, Object> map = new HashMap<>();
                 map.put("message", "Login de ONG realizado con éxito");
-                map.put("user", organizacionReal.getNombreOrganizacion()); 
+                map.put("user", organizacionReal.getNombreOrganizacion());
                 map.put("roles", authorities.toString());
-                map.put("id", organizacionReal.getIdOrganizacion());       
-                map.put("ong", organizacionReal);                          
+                map.put("id", organizacionReal.getIdOrganizacion());
+                map.put("ong", organizacionReal);
 
                 return ResponseEntity.status(HttpStatus.OK).body(map);
             } else {

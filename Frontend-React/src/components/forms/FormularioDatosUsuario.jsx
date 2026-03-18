@@ -16,6 +16,7 @@ export default function Formulario_Datos_Usuario({ datosActuales, onCancelar, on
     });
 
     const [errorMsg, setErrorMsg] = useState("");
+    const [imagen, setImagen] = useState(null);
 
     const handleChange = (e) => {
         const { id, value } = e.target;
@@ -45,16 +46,30 @@ export default function Formulario_Datos_Usuario({ datosActuales, onCancelar, on
             localidad: formData.localidad
         };
 
+        const formDataToSend = new FormData();
+        formDataToSend.append(
+            esONG ? "organizacion" : "usuario",
+            new Blob([JSON.stringify(bodyData)], { type: "application/json" })
+        );
+        if (imagen) {
+            formDataToSend.append("imagen", imagen);
+        }
+
         try {
             const response = await fetch(endpoint, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
                 credentials: "include",
-                body: JSON.stringify(bodyData),
+                body: formDataToSend,
             });
 
             if (response.ok) {
-                onGuardar(formData);
+                const data = await response.json();
+                const updatedItem = data.updatedUser || data.updateRealizado;
+
+                onGuardar({
+                    ...formData,
+                    imagen: updatedItem ? (updatedItem.foto || updatedItem.logo) : datosActuales.imagen
+                });
             } else {
                 const errorData = await response.json();
                 setErrorMsg(errorData.error || "Error al actualizar los datos");
@@ -65,72 +80,81 @@ export default function Formulario_Datos_Usuario({ datosActuales, onCancelar, on
         }
     };
 
+    const handleOverlayClick = (e) => {
+        if (e.target === e.currentTarget) {
+            onCancelar();
+        }
+    };
+
     return (
-        <div className="row justify-content-center mb-5">
-            <div className="col-lg-12">
-                <div className="card contact-card bg-light p-5 border-0 shadow-sm">
-                    <div className="card-body">
-                        <form className="needs-validation" noValidate onSubmit={handleSubmit}>
-                            <h3 className="mb-4 text-primary">{esONG ? "Editar Perfil Institucional" : "Editar Datos Personales"}</h3>
+        <div className="modal-overlay shadow" onClick={handleOverlayClick}>
+            <div className="bg-white p-4 p-md-5 rounded-4 shadow-lg w-100" style={{ maxWidth: "600px", maxHeight: "90vh", overflowY: "auto" }} onClick={(e) => e.stopPropagation()}>
+                <form className="needs-validation" noValidate onSubmit={handleSubmit}>
+                    <h3 className="mb-4 text-primary">{esONG ? "Editar Perfil Institucional" : "Editar Datos Personales"}</h3>
 
-                            {errorMsg && <div className="alert alert-danger">{errorMsg}</div>}
+                    {errorMsg && <div className="alert alert-danger">{errorMsg}</div>}
 
-                            <div className="row">
-                                <div className={esONG ? "col-md-12 mb-3" : "col-md-6 mb-3"}>
-                                    <label htmlFor="nombre" className="form-label">
-                                        {esONG ? "Nombre de la Organización:" : "Nombre:"}
-                                    </label>
-                                    <input type="text" className="form-control bg-white" id="nombre" value={formData.nombre} onChange={handleChange} required />
-                                </div>
+                    <div className="row">
+                        <div className={esONG ? "col-md-12 mb-3" : "col-md-6 mb-3"}>
+                            <label htmlFor="nombre" className="form-label">
+                                {esONG ? "Nombre de la Organización:" : "Nombre:"}
+                            </label>
+                            <input type="text" className="form-control bg-white" id="nombre" value={formData.nombre} onChange={handleChange} required />
+                        </div>
 
-                                {!esONG && (
-                                    <div className="col-md-6 mb-3">
-                                        <label htmlFor="apellidos" className="form-label">Apellidos:</label>
-                                        <input type="text" className="form-control bg-white" id="apellidos" value={formData.apellidos} onChange={handleChange} required />
-                                    </div>
-                                )}
+                        {!esONG && (
+                            <div className="col-md-6 mb-3">
+                                <label htmlFor="apellidos" className="form-label">Apellidos:</label>
+                                <input type="text" className="form-control bg-white" id="apellidos" value={formData.apellidos} onChange={handleChange} required />
                             </div>
-
-                            <div className="row">
-                                <div className="col-md-6 mb-3">
-                                    <label htmlFor="email" className="form-label">Correo Electrónico:</label>
-                                    <input type="email" className="form-control bg-white" id="email" value={formData.email} onChange={handleChange} required />
-                                </div>
-
-                                {esONG && (
-                                    <div className="col-md-6 mb-3">
-                                        <label htmlFor="telefono" className="form-label">Teléfono de Contacto:</label>
-                                        <input type="text" className="form-control bg-white" id="telefono" value={formData.telefono} onChange={handleChange} required />
-                                    </div>
-                                )}
-                            </div>
-
-                            {esONG && (
-                                <div className="mb-3">
-                                    <label htmlFor="sitioWeb" className="form-label">Sitio Web (URL):</label>
-                                    <input type="text" className="form-control bg-white" id="sitioWeb" value={formData.sitioWeb} onChange={handleChange} placeholder="www.ejemplo.org" />
-                                </div>
-                            )}
-
-                            <div className="mb-3">
-                                <label htmlFor="localidad" className="form-label">Localidad / Ubicación:</label>
-                                <input type="text" className="form-control bg-white" id="localidad" value={formData.localidad} onChange={handleChange} />
-                            </div>
-
-                            <div className="mb-4">
-                                <label htmlFor="bio" className="form-label">
-                                    {esONG ? "Descripción / Misión:" : "Biografía:"}
-                                </label>
-                                <textarea className="form-control bg-white" id="bio" rows="5" value={formData.bio} onChange={handleChange} required></textarea>
-                            </div>
-
-                            <div className="d-flex gap-3 mt-4">
-                                <button type="button" className="btn btn-outline-secondary w-50" onClick={onCancelar}>Cancelar</button>
-                                <button type="submit" className="btn btn-primary w-50">Guardar Cambios</button>
-                            </div>
-                        </form>
+                        )}
                     </div>
-                </div>
+
+                    <div className="row">
+                        <div className="col-md-6 mb-3">
+                            <label htmlFor="email" className="form-label">Correo Electrónico:</label>
+                            <input type="email" className="form-control bg-white" id="email" value={formData.email} onChange={handleChange} required />
+                        </div>
+
+                        {esONG && (
+                            <div className="col-md-6 mb-3">
+                                <label htmlFor="telefono" className="form-label">Teléfono de Contacto:</label>
+                                <input type="text" className="form-control bg-white" id="telefono" value={formData.telefono} onChange={handleChange} required />
+                            </div>
+                        )}
+                    </div>
+
+                    {esONG && (
+                        <div className="mb-3">
+                            <label htmlFor="sitioWeb" className="form-label">Sitio Web (URL):</label>
+                            <input type="text" className="form-control bg-white" id="sitioWeb" value={formData.sitioWeb} onChange={handleChange} placeholder="www.ejemplo.org" />
+                        </div>
+                    )}
+
+                    <div className="mb-3">
+                        <label htmlFor="localidad" className="form-label">Localidad / Ubicación:</label>
+                        <input type="text" className="form-control bg-white" id="localidad" value={formData.localidad} onChange={handleChange} />
+                    </div>
+
+                    <div className="mb-3">
+                        <label htmlFor="imagen" className="form-label">
+                            {esONG ? "Logo de la Organización:" : "Foto de Perfil:"}
+                        </label>
+                        <input type="file" className="form-control bg-white" id="imagen" accept="image/*" onChange={(e) => setImagen(e.target.files[0])} />
+                    </div>
+
+                    <div className="mb-4">
+                        <label htmlFor="bio" className="form-label">
+                            {esONG ? "Descripción / Misión:" : "Biografía:"}
+                        </label>
+                        <textarea className="form-control bg-white" id="bio" rows="5" value={formData.bio} onChange={handleChange} required></textarea>
+                    </div>
+
+                    <div className="d-flex gap-3 mt-4">
+                        <button type="button" className="btn btn-outline-secondary w-50" onClick={onCancelar}>Cancelar</button>
+                        <button type="submit" className="btn btn-primary text-white w-50">Guardar Cambios</button>
+                    </div>
+                </form>
             </div>
         </div>
     );

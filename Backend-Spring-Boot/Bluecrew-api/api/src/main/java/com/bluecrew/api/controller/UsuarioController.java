@@ -13,6 +13,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.io.IOException;
 
 import com.bluecrew.api.model.Rol;
 import com.bluecrew.api.model.Usuario;
@@ -106,9 +111,10 @@ public class UsuarioController {
     // INSERT (POST)
     // http://localhost:8080/api/usuarios
     @Operation(summary = "Inserta un usuario", description = "Inserta un usuario en la base de datos")
-    @PostMapping
+    @PostMapping(consumes = { "multipart/form-data" })
     public ResponseEntity<Map<String, Object>> create(
-            @Valid @RequestBody Usuario usuario) {
+            @Valid @RequestPart("usuario") Usuario usuario,
+            @RequestPart(value = "imagen", required = false) MultipartFile imagen) {
         ResponseEntity<Map<String, Object>> response;
 
         if (usuario == null) {
@@ -118,6 +124,26 @@ public class UsuarioController {
                     .status(HttpStatus.BAD_REQUEST)
                     .body(map);
         } else {
+            if (imagen != null && !imagen.isEmpty()) {
+                try {
+                    String uploadDir = "uploads/";
+                    Path uploadPath = Paths.get(uploadDir);
+                    if (!Files.exists(uploadPath)) {
+                        Files.createDirectories(uploadPath);
+                    }
+
+                    String originalFilename = imagen.getOriginalFilename();
+                    Path filePath = uploadPath.resolve(originalFilename);
+                    Files.write(filePath, imagen.getBytes());
+
+                    usuario.setFoto(originalFilename);
+                } catch (IOException e) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("error", "No se pudo guardar la imagen: " + e.getMessage());
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(map);
+                }
+            }
+
             if (usuario.getNombre() == null || usuario.getNombre().trim().isEmpty() ||
                     usuario.getApellido() == null || usuario.getApellido().trim().isEmpty() ||
                     usuario.getEmail() == null || usuario.getEmail().trim().isEmpty() ||
@@ -163,16 +189,17 @@ public class UsuarioController {
         return response;
     }
 
-    // ****************************************************************************
+    // ***************** ***********************************************************
     // UPDATE (PUT)
     // http://localhost:8080/api/usuarios/{id}
     @Operation(summary = "Actualizar un usuario existente", description = "Reemplaza completamente los datos de un usuario identificado por su ID")
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = { "multipart/form-data" })
     public ResponseEntity<Map<String, Object>> updateUser(
             @PathVariable int id,
-            @RequestBody Usuario userUpdate) {
+            @RequestPart(value = "usuario", required = false) Usuario userUpdate,
+            @RequestPart(value = "imagen", required = false) MultipartFile imagen) {
 
-        if (userUpdate == null) {
+        if (userUpdate == null && imagen == null) {
             Map<String, Object> map = new HashMap<>();
             map.put("error", "El cuerpo de la solicitud no puede estar vacío");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(map);
@@ -186,30 +213,52 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(map);
         }
 
-        if (userUpdate.getNombre() != null) {
-            existingUser.setNombre(userUpdate.getNombre());
-        }
-        if (userUpdate.getApellido() != null) {
-            existingUser.setApellido(userUpdate.getApellido());
-        }
-        if (userUpdate.getEmail() != null) {
-            existingUser.setEmail(userUpdate.getEmail());
-        }
-        if (userUpdate.getBiografia() != null) {
-            existingUser.setBiografia(userUpdate.getBiografia());
-        }
-        if (userUpdate.getFoto() != null) {
-            existingUser.setFoto(userUpdate.getFoto());
-        }
-        if (userUpdate.getLocalidad() != null) {
-            existingUser.setLocalidad(userUpdate.getLocalidad());
-        }
-        if (userUpdate.getRol() != null) {
-            existingUser.setRol(userUpdate.getRol());
+        if (imagen != null && !imagen.isEmpty()) {
+            try {
+                String uploadDir = "uploads/";
+                Path uploadPath = Paths.get(uploadDir);
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath);
+                }
+
+                String originalFilename = imagen.getOriginalFilename();
+                Path filePath = uploadPath.resolve(originalFilename);
+                Files.write(filePath, imagen.getBytes());
+
+                existingUser.setFoto(originalFilename);
+            } catch (IOException e) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("error", "No se pudo guardar la nueva imagen: " + e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(map);
+            }
         }
 
-        if (userUpdate.getPassword_hash() != null && !userUpdate.getPassword_hash().trim().isEmpty()) {
-            existingUser.setPassword_hash(passwordEncoder.encode(userUpdate.getPassword_hash()));
+        if (userUpdate != null) {
+            if (userUpdate.getNombre() != null) {
+                existingUser.setNombre(userUpdate.getNombre());
+            }
+            if (userUpdate.getApellido() != null) {
+                existingUser.setApellido(userUpdate.getApellido());
+            }
+            if (userUpdate.getEmail() != null) {
+                existingUser.setEmail(userUpdate.getEmail());
+            }
+            if (userUpdate.getBiografia() != null) {
+                existingUser.setBiografia(userUpdate.getBiografia());
+            }
+            if (userUpdate.getFoto() != null) {
+                existingUser.setFoto(userUpdate.getFoto());
+            }
+            if (userUpdate.getLocalidad() != null) {
+                existingUser.setLocalidad(userUpdate.getLocalidad());
+            }
+            if (userUpdate.getRol() != null) {
+                existingUser.setRol(userUpdate.getRol());
+            }
+
+            if (userUpdate.getPassword_hash() != null && !userUpdate.getPassword_hash().trim().isEmpty()) {
+                existingUser.setPassword_hash(passwordEncoder.encode(userUpdate.getPassword_hash()));
+            }
         }
 
         Usuario usuPut = usuarioRepository.save(existingUser);

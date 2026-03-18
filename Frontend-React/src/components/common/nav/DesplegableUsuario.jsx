@@ -11,6 +11,7 @@ export default function DesplegableUsuario({ onLogout }) {
   
   const ongId = localStorage.getItem("ongId");
   const usuarioId = localStorage.getItem("usuarioId");
+  const esONG = Boolean(ongId);
 
   useEffect(() => {
     const fetchUsuarios = async () => {
@@ -91,6 +92,7 @@ export default function DesplegableUsuario({ onLogout }) {
             <i className="bi bi-geo-alt-fill"></i> Crear Evento
           </Link>
         </li>}
+        {!esONG &&
         <li>
           <Link
             className="dropdown-item d-flex align-items-center gap-2 py-2 text-secondary"
@@ -98,7 +100,7 @@ export default function DesplegableUsuario({ onLogout }) {
           >
             <i className="bibi bi-pencil-square"></i> Participaciones
           </Link>
-        </li>
+        </li>}
         <li>
           <hr className="dropdown-divider border-secondary" />
         </li>

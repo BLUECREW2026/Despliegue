@@ -12,6 +12,8 @@ export default function UserProfile() {
   const [showModal, setShowModal] = useState(false);
 
   const rol = localStorage.getItem("rol");
+  const ongId = localStorage.getItem("ongId");
+  const esONG = Boolean(ongId);
 
   const obtenerImagen = (nombreImagen) => {
     if (!nombreImagen) return profilePhoto;
@@ -244,7 +246,7 @@ export default function UserProfile() {
             )}
           </div>
         </div>
-
+        {!esONG &&
         <div
           className="card shadow-sm rounded-4 border-0 p-3 bg-white"
           style={{ width: "16rem" }}
@@ -267,7 +269,7 @@ export default function UserProfile() {
               Historial
             </Link>
           </div>
-        </div>
+        </div>}
       </div>
       <LoginModal
         open={showModal}

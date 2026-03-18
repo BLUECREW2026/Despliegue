@@ -90,7 +90,7 @@ public interface EventoRepository extends JpaRepository<Evento, Integer> {
                         "e.MATERIAL_NECESARIO, e.UBICACION, e.PARTICIPANTES " +
                         "FROM EVENTOS e " +
                         "JOIN CATEGORIAS c ON e.ID_CATEGORIA = c.ID_CATEGORIA " +
-                        "WHERE e.id_o = :idOng " + // Filtro por ID de la ONG
+                        "WHERE e.id_organizacion = :idOng " + // Filtro por ID de la ONG
                         "AND e.FINALIZADO = false " +
                         "AND e.ESTADO = 'APROBADO'", nativeQuery = true)
         List<Object[]> findEventosPublicadosByOng(@Param("idOng") int idOng);

@@ -84,4 +84,14 @@ public interface EventoRepository extends JpaRepository<Evento, Integer> {
                         "AND e.ESTADO = 'PENDIENTE'", nativeQuery = true)
         List<Object[]> findEventosPendientesAprobacionByUsuario(@Param("idUsuario") int idUsuario);
 
+
+        @Query(value = "SELECT e.ID_EVENTO, e.TITULO, e.IMAGEN, e.DESCRIPCION AS EVENTO_DESC, " +
+                        "e.FECHA_Inicio, c.NOMBRE_CATEGORIA, c.DESCRIPCION AS CATEGORIA_DESC, " +
+                        "e.MATERIAL_NECESARIO, e.UBICACION, e.PARTICIPANTES " +
+                        "FROM EVENTOS e " +
+                        "JOIN CATEGORIAS c ON e.ID_CATEGORIA = c.ID_CATEGORIA " +
+                        "WHERE e.id_o = :idOng " + // Filtro por ID de la ONG
+                        "AND e.FINALIZADO = false " +
+                        "AND e.ESTADO = 'APROBADO'", nativeQuery = true)
+        List<Object[]> findEventosPublicadosByOng(@Param("idOng") int idOng);
 }

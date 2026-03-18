@@ -67,6 +67,11 @@ public class EventoService {
         return eventoRepository.findEventosPendientesAprobacionByUsuario(idUsuario);
     }
 
+    @Transactional(readOnly = true)
+    public List<Object[]> findEventosPublicadosByOng(int idOng) {
+        return eventoRepository.findEventosPublicadosByOng(idOng);
+    }
+
     // ************************
     // ACTUALIZACIONES
     // ************************

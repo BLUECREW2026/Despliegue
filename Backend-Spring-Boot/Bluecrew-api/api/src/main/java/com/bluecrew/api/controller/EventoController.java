@@ -110,6 +110,12 @@ public class EventoController {
         return ResponseEntity.status(HttpStatus.OK).body(eventoService.findEventosPendientesAprobacionByUsuario(id));
     }
 
+    @Operation(summary = "Obtiene los eventos publicados por una ONG", description = "Retorna una lista de eventos publicados por una ONG")
+    @GetMapping("/mis-eventos/publicados/ong/{id}")
+    public ResponseEntity<List<Object[]>> findEventosPublicadosByOng(@PathVariable int id) {
+        return ResponseEntity.status(HttpStatus.OK).body(eventoService.findEventosPublicadosByOng(id));
+    }
+
 
     // ***************************************************************************
     // ACTUALIZACIONES

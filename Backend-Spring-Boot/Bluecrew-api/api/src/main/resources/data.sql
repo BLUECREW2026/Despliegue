@@ -111,7 +111,7 @@ VALUES
 -- ======================================================
 INSERT INTO EVENTOS (ID_CATEGORIA, ID_USER, ID_ORGANIZACION, TITULO, DESCRIPCION, IMAGEN, FECHA_INICIO, FECHA_FIN, UBICACION, ESTADO, PARTICIPANTES, FINALIZADO, MATERIAL_NECESARIO)
 VALUES 
-    (1, 1, NULL, 'Playa Postiguet', 'Limpieza masiva', 'playa-postiguet.jpg', '2026-06-01 09:00', '2026-06-01 13:00', 'Alicante', 'APROBADO', 50, TRUE, 'Bolsas'),
+    (1, NULL, 1, 'Playa Postiguet', 'Limpieza masiva', 'playa-postiguet.jpg', '2026-06-01 09:00', '2026-06-01 13:00', 'Alicante', 'APROBADO', 50, FALSE, 'Bolsas'),
     (2, 3, NULL, 'Pinos en Costa', 'Reforestación', 'pinos.jpg', '2026-10-15 08:30', '2026-10-15 14:00', 'Valencia', 'PENDIENTE', 20, FALSE, 'Azada'),
     (3, 3, NULL, 'Río Segura Limpio', 'Sacamos basura', 'saneamiento-rio.jpg', '2026-07-05 09:00', '2026-07-05 14:00', 'Murcia', 'APROBADO', 100, FALSE, 'Botas'),
     (5, 1, NULL, 'Fondo de Tabarca', 'Buceo basura', 'buceo.jpg', '2026-08-10 08:00', '2026-08-10 12:00', 'Tabarca', 'APROBADO', 15, FALSE, 'Equipo buceo'),

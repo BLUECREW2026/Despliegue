@@ -54,6 +54,7 @@ function App() {
           titulo: item[1],
           imagen: item[2],
           descripcionEvento: item[3],
+          fechaOriginal: new Date(item[4]),
           fechaDisplay: fecha,
           horaDisplay: hora,
           categoria: item[5],

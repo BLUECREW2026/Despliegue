@@ -15,7 +15,7 @@ export default function Eventos({ datos }) {
 
     const filteredEvents = datos.filter((e) => {
         const text = query.toLowerCase();
-        const fechaEvento = new Date(e.fechaDisplay);
+        const fechaEvento = new Date(e.fechaOriginal);
 
         const cumpleTexto = e.titulo.toLowerCase().includes(text);
 

@@ -1,24 +1,25 @@
 package com.bluecrew.api.config;
 
+import com.bluecrew.api.security.JwtAuthenticationFilter;
 import com.bluecrew.api.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer; // CORREGIDO
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UserDetailsPasswordService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -26,76 +27,69 @@ import java.util.List;
 public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(CustomUserDetailsService customUserDetailsService) {
+    // Inyectamos el filtro JWT para que la seguridad funcione en producción
+    public SecurityConfig(CustomUserDetailsService customUserDetailsService, JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.customUserDetailsService = customUserDetailsService;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                // Permitir el acceso a la carpeta de imágenes estáticas
-                .requestMatchers("/uploads/**").permitAll()
-                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/usuarios").permitAll()
-                // --- MODO DESARROLLO: ABIERTO ---
-                .anyRequest().permitAll() //TODO: ¡CUIDADO! Quitar antes de ir a producción
-                
-
-                /* ----------- CÓDIGO ORIGINAL COMENTADO (HABILITAR EN PRODUCCIÓN) ---------------------------------------------
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/", "/index.html", "/error", "/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                // Permitimos ver la lista de eventos y noticias (solo metodo GET)
-                .requestMatchers(HttpMethod.GET, "/api/eventos").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/noticias/**").permitAll()
-                // Reglas Protegidas
-                .requestMatchers("/api/usuarios/**").hasRole("ADMIN")
-                // Cualquier OTRA petición a eventos (como GET /api/eventos/{id} o POST) requerirá token
-                .requestMatchers("/api/eventos/**").authenticated()
-                .anyRequest().authenticated()
-                --------------------------------------------------------------------------------------------*/
-            )
-            // Cambiamos a STATELESS (sin estado)
-            // .sessionManagement(session -> session
-            //     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            // );
-
+            .csrf(csrf -> csrf.disable()) // Deshabilitado porque usamos JWT
             .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // JWT no requiere estado
             )
-            .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+            .authorizeHttpRequests(auth -> auth
+                // Acceso público a recursos estáticos e imágenes
+                .requestMatchers("/uploads/**", "/static/**", "/favicon.ico").permitAll()
+                
+                // Endpoints de autenticación y registro (Acceso Libre)
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll() // Registro de voluntarios
+                .requestMatchers(HttpMethod.POST, "/api/organizaciones/register").permitAll() // Registro de ONGs
+                
+                // Swagger / Documentación (Acceso Libre)
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                
+                // Consultas públicas (GET)
+                .requestMatchers(HttpMethod.GET, "/api/eventos", "/api/noticias/**").permitAll()
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Necesario para CORS pre-flight
 
-            // Añadimos nuestro filtro JWT antes del filtro de autenticación por defecto
-            // .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-            // ----------------------- DESCOMENTAR LO DE ARRIBA EN PRODUCCION ----------------------
+                // Reglas Protegidas
+                .requestMatchers("/api/usuarios/**").hasRole("ADMIN") // Solo admin gestiona usuarios
+                .requestMatchers("/api/organizaciones/**").authenticated() // ONGs autenticadas
+                .requestMatchers("/api/eventos/**").authenticated() // Crear o inscribirse requiere login
+                
+                // Cualquier otra petición requiere estar logueado
+                .anyRequest().authenticated()
+            )
+            // Añadimos el filtro JWT antes del filtro de autenticación por defecto
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
     @Bean
-    public DaoAuthenticationProvider authProvider(
-            UserDetailsService userDetailsService,
-            PasswordEncoder passwordEncoder) {     
-
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
+    public DaoAuthenticationProvider authProvider(PasswordEncoder passwordEncoder) {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(customUserDetailsService);
+        provider.setUserDetailsPasswordService((UserDetailsPasswordService) customUserDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
         return provider;
     }
-
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-       
-      configuration.setAllowedOriginPatterns(List.of("*"));
-        
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Access-Control-Allow-Origin"));
-        configuration.setAllowCredentials(true); 
+        // En PRODUCCIÓN cambia "*" por la URL de tu frontend (ej: "https://bluecrew.com")
+        configuration.setAllowedOriginPatterns(List.of("*")); 
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Accept"));
+        configuration.setAllowCredentials(true); // Permite el envío de cookies/auth headers
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -111,5 +105,4 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    
 }
